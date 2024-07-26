@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="ВЗИК &amp; Водно-зеленая инфраструктура">
+    <link rel="shortcut icon" href="{% static 'img/icons/favicon.ico' %}">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css"/>
+
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/map.css' %}">
+    <title>{% block title %}Водно-зеленая карта{% endblock %}</title>
+</head>
+<body>
+<div class="wrapper">
+    {% include 'includes/sidebar.html' %}
+    <div class="main">
+        {% include 'includes/navbar.html' %}
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+<script src="{% static 'js/app.js' %}"></script>
+<script src="{% static 'js/map.js' %}"></script>
+</body>
+</html>

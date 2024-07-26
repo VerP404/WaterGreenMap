@@ -1,0 +1,37 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.sidebar {
+    height: 100%;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.navbar {
+    flex-shrink: 0;
+}
+
+.content {
+    flex-grow: 1;
+    height: calc(100% - 56px); /* Adjust this if your navbar height is different */
+    overflow: hidden;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}

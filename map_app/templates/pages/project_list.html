@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}ВЗИК | Профиль{% endblock %}
+
+{% block content %}
+    <main class="content">
+        <div class="container-fluid p-0">
+            <div class="mb-3">
+                <h1 class="h3 d-inline align-middle">Список проектов</h1>
+                <div class="btn-group float-end">
+                    <button id="tableViewBtn" class="btn btn-primary btn-sm"><i class="align-middle" data-feather="list"></i> список</button>
+                    <button id="gridViewBtn" class="btn btn-outline-primary btn-sm"><i class="align-middle" data-feather="grid"></i> сетка</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-xl-3">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Категория</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="text-muted mb-2">Тут будет описание категории отфильтрованного проекта</div>
+                        </div>
+                        <hr class="my-0"/>
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Тип</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="text-muted mb-2">Тут будет описание типа отфильтрованного проекта</div>
+                        </div>
+                        <hr class="my-0"/>
+                    </div>
+                </div>
+
+                <div class="col-md-8 col-xl-9">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Список проектов</h5>
+                        </div>
+                        <div class="card-body h-100">
+                            <!-- Table View -->
+                            <div id="tableView">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Изображение</th>
+                                        <th scope="col">Название</th>
+                                        <th scope="col">Тип объекта</th>
+                                        <th scope="col">Дата добавления</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- Example project rows -->
+                                    <tr>
+                                        <td><img src="{% static 'img/avatars/avatar-5.jpg' %}" width="50"
+                                                 class="img-fluid" alt="Project Image"></td>
+                                        <td>Project 1</td>
+                                        <td>Type A</td>
+                                        <td>2024-07-21</td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="{% static 'img/avatars/avatar-4.jpg' %}" width="50"
+                                                 class="img-fluid" alt="Project Image"></td>
+                                        <td>Project 2</td>
+                                        <td>Type B</td>
+                                        <td>2024-07-22</td>
+                                    </tr>
+                                    <!-- Add more rows as needed -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Grid View -->
+                            <div id="gridView" class="row d-none">
+                                <!-- Example project tiles -->
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <img src="{% static 'img/avatars/avatar-5.jpg' %}" class="card-img-top"
+                                             alt="Project Image">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Project 1</h5>
+                                            <p class="card-text">Type A</p>
+                                            <p class="text-muted">2024-07-21</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <img src="{% static 'img/avatars/avatar-4.jpg' %}" class="card-img-top"
+                                             alt="Project Image">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Project 2</h5>
+                                            <p class="card-text">Type B</p>
+                                            <p class="text-muted">2024-07-22</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Add more tiles as needed -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tableViewBtn = document.getElementById('tableViewBtn');
+            const gridViewBtn = document.getElementById('gridViewBtn');
+            const tableView = document.getElementById('tableView');
+            const gridView = document.getElementById('gridView');
+
+            tableViewBtn.addEventListener('click', function () {
+                tableView.classList.remove('d-none');
+                gridView.classList.add('d-none');
+                tableViewBtn.classList.add('btn-primary');
+                tableViewBtn.classList.remove('btn-outline-primary');
+                gridViewBtn.classList.add('btn-outline-primary');
+                gridViewBtn.classList.remove('btn-primary');
+            });
+
+            gridViewBtn.addEventListener('click', function () {
+                tableView.classList.add('d-none');
+                gridView.classList.remove('d-none');
+                gridViewBtn.classList.add('btn-primary');
+                gridViewBtn.classList.remove('btn-outline-primary');
+                tableViewBtn.classList.add('btn-outline-primary');
+                tableViewBtn.classList.remove('btn-primary');
+            });
+        });
+    </script>
+{% endblock %}
