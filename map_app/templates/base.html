@@ -9,12 +9,9 @@
     <link rel="shortcut icon" href="{% static 'img/icons/favicon.ico' %}">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css"/>
-
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
-    <link rel="stylesheet" href="{% static 'css/map.css' %}">
     <title>{% block title %}Водно-зеленая карта{% endblock %}</title>
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
 <div class="wrapper">
@@ -24,10 +21,7 @@
         {% block content %}{% endblock %}
     </div>
 </div>
-
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
 <script src="{% static 'js/app.js' %}"></script>
-<script src="{% static 'js/map.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>
