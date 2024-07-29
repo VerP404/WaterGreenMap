@@ -1,0 +1,21 @@
+    <!-- Модальное окно -->
+    <div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProjectModalLabel">Добавить объект</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProjectForm" method="post" action="{% url 'add_project' %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="hidden" id="projectLatitude" name="latitude">
+                        <input type="hidden" id="projectLongitude" name="longitude">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>

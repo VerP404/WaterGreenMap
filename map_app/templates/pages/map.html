@@ -15,5 +15,51 @@
 {% endblock %}
 
 {% block content %}
-    {% include 'includes/content.html' %}
+    <div class="map-container" style="position: relative;">
+        <div id="map" style="height: 100vh;"></div>
+        <button id="addObjectBtn" class="btn btn-success btn-add-object">Добавить объект</button>
+    </div>
+
+    <!-- Модальное окно подтверждения точки -->
+    <div class="modal fade" id="confirmPointModal" tabindex="-1" aria-labelledby="confirmPointModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmPointModalLabel">Подтвердите выбор точки</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите выбрать эту точку для добавления объекта?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="confirmPointButton">Подтвердить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления объекта -->
+    <div class="modal fade" id="addProjectModal" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProjectModalLabel">Добавить объект</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProjectForm" method="post" action="{% url 'projects:add_project' %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="hidden" id="projectLatitude" name="latitude">
+                        <input type="hidden" id="projectLongitude" name="longitude">
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
