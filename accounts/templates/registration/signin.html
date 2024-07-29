@@ -35,6 +35,14 @@
                                         <img src="{% static 'img/logo/logo.png' %}" alt="Charles Hall" class="img-fluid rounded-circle" width="132" height="132" />
                                         <span class="ms-2 display-5 font-weight-bold text-uppercase text-black">ВЗИК</span>
                                     </div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                                {{ message }}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
                                     <form method="post">
                                         {% csrf_token %}
                                         <div class="mb-3">

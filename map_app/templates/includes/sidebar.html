@@ -1,4 +1,3 @@
-<!-- templates/includes/sidebar.html -->
 {% load static %}
 <nav id="sidebar" class="sidebar js-sidebar">
     <div class="sidebar-content js-simplebar">
@@ -97,15 +96,44 @@
             </li>
         </ul>
         <div class="sidebar-cta">
-            <div class="sidebar-cta-content">
-                <strong class="d-inline-block mb-2">Проект курирует</strong>
-                <div class="mb-3 text-sm">
-                    Гильдия ландшафтных инженеров
-                </div>
-                <div class="d-grid">
-                    <a href="https://laenguild.org/" class="btn btn-primary">Узнать больше</a>
-                </div>
+            <div class="sidebar-cta-content text-center">
+                <a href="https://laenguild.org/" target="_blank">
+                    <img src="{% static 'img/logo/Logo_lanit.png' %}" alt="Lanit Logo" class="img-fluid">
+                </a>
             </div>
         </div>
     </div>
 </nav>
+
+<style>
+    .navbar-brand {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .navbar-brand-full {
+        display: inline;
+    }
+
+    .navbar-brand-short {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .navbar-brand-full {
+            display: none;
+        }
+
+        .navbar-brand-short {
+            display: inline;
+        }
+    }
+
+    .btn-link {
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        text-decoration: none;
+    }
+</style>

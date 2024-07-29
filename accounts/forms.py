@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser, ActivityArea
 
+
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control form-control-lg',
@@ -14,10 +15,6 @@ class CustomUserCreationForm(UserCreationForm):
     last_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control form-control-lg',
         'placeholder': 'Введите вашу фамилию',
-    }))
-    profession = forms.CharField(widget=forms.TextInput(attrs={
-        'class': 'form-control form-control-lg',
-        'placeholder': 'Введите вашу профессию',
     }))
     workplace = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control form-control-lg',
@@ -46,7 +43,10 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name', 'password1', 'password2', 'profession', 'workplace', 'phone', 'position', 'activity_area')
+        fields = (
+            'email', 'first_name', 'last_name', 'password1', 'password2', 'workplace', 'phone', 'position',
+            'activity_area')
+
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(widget=forms.EmailInput(attrs={
@@ -57,3 +57,26 @@ class CustomAuthenticationForm(AuthenticationForm):
         'class': 'form-control form-control-lg',
         'placeholder': 'Введите пароль',
     }))
+
+
+class CustomUserChangeForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'phone', 'workplace', 'position', 'activity_area', 'avatar']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'workplace': forms.TextInput(attrs={'class': 'form-control'}),
+            'position': forms.TextInput(attrs={'class': 'form-control'}),
+            'activity_area': forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+            'phone': 'Телефон',
+            'workplace': 'Место работы',
+            'position': 'Должность',
+            'activity_area': 'Сфера деятельности',
+            'avatar': 'Аватар',
+        }
