@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}ВЗИК | Добавить проект{% endblock %}
+
+{% block content %}
+<main class="content">
+    <div class="container-fluid p-0">
+        <div class="mb-3">
+            <h1 class="h3 d-inline align-middle">Добавить проект</h1>
+        </div>
+        <div class="row">
+            <!-- Карточка Основная информация -->
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Основная информация</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label" for="id_title">Название</label>
+                                {{ form.title }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_description">Описание</label>
+                                {{ form.description }}
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Карточка Категория объекта -->
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Категория объекта</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="category-container">
+                            <div class="mb-3 category-entry">
+                                <div class="d-flex">
+                                    <div class="me-2 flex-fill">
+                                        <label class="form-label" for="id_category">Категория</label>
+                                        {{ form.category }}
+                                    </div>
+                                    <div class="flex-fill">
+                                        <label class="form-label" for="id_main_type">Основной тип</label>
+                                        {{ form.main_type }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="add-category-type" class="btn btn-secondary">Добавить категорию и тип</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Карточка Фотографии, видео, ссылки -->
+            <div class="col-12 col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Фотографии, видео, ссылки</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ photo_formset.management_form }}
+                        {{ video_formset.management_form }}
+                        {{ link_formset.management_form }}
+
+                        <!-- Фотографии -->
+                        <div class="mb-3">
+                            <label class="form-label">Фотографии</label>
+                            <div id="photo-container">
+                                {% for form in photo_formset %}
+                                    <div class="photo-entry d-flex">
+                                        <input type="file" name="photo-{{ forloop.counter0 }}-image" class="form-control me-2" />
+                                        {% if forloop.first %}
+                                            <span class="form-check-label mt-2">Основная</span>
+                                        {% else %}
+                                            <span class="form-check-label mt-2">Дополнительная</span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" id="add-photo" class="btn btn-secondary mt-2">Добавить фотографию</button>
+                        </div>
+                        <hr class="my-0" />
+                        <!-- Видео -->
+                        <div class="mb-3">
+                            <label class="form-label">Видео</label>
+                            <div id="video-container">
+                                {% for form in video_formset %}
+                                    <div class="video-entry d-flex">
+                                        <input type="url" name="video-{{ forloop.counter0 }}-video" placeholder="Ссылка на видео" class="form-control me-2" />
+                                        <input type="text" name="video-{{ forloop.counter0 }}-description" placeholder="Описание" class="form-control me-2" />
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" id="add-video" class="btn btn-secondary mt-2">Добавить видео</button>
+                        </div>
+                        <hr class="my-0" />
+                        <!-- Ссылки -->
+                        <div class="mb-3">
+                            <label class="form-label">Ссылки на дополнительные материалы</label>
+                            <div id="link-container">
+                                {% for form in link_formset %}
+                                    <div class="link-entry d-flex">
+                                        <input type="url" name="link-{{ forloop.counter0 }}-url" placeholder="Ссылка" class="form-control me-2" />
+                                        <input type="text" name="link-{{ forloop.counter0 }}-description" placeholder="Описание" class="form-control me-2" />
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" id="add-link" class="btn btn-secondary mt-2">Добавить ссылку</button>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Добавить проект</button>
+                            <button type="button" onclick="history.back()" class="btn btn-lg btn-light w-50">Назад</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoryField = document.getElementById('id_category');
+        const mainTypeField = document.getElementById('id_main_type');
+        const additionalCategoryField = document.getElementById('id_additional_category');
+        const additionalTypeField = document.getElementById('id_additional_type');
+        const additionalTypesContainer = document.getElementById('additional-types-container');
+        const addAdditionalTypeButton = document.getElementById('add-additional-type');
+        const categoryContainer = document.getElementById('category-container');
+        const addCategoryTypeButton = document.getElementById('add-category-type');
+        const photoContainer = document.getElementById('photo-container');
+        const addPhotoButton = document.getElementById('add-photo');
+        const videoContainer = document.getElementById('video-container');
+        const addVideoButton = document.getElementById('add-video');
+        const linkContainer = document.getElementById('link-container');
+        const addLinkButton = document.getElementById('add-link');
+
+        function checkDuplicateTypes() {
+            const typeFields = document.querySelectorAll('select[name^="additional_type_"]');
+            const types = Array.from(typeFields).map(field => field.value);
+            return new Set(types).size !== types.length;
+        }
+
+        function fetchTypesByCategory(categoryId, targetField) {
+            if (categoryId) {
+                fetch(`/get_types_by_category/${categoryId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let options = '<option value="">---------</option>';
+                        data.types.forEach(type => {
+                            options += `<option value="${type.id}">${type.name}</option>`;
+                        });
+                        targetField.innerHTML = options;
+                    });
+            } else {
+                targetField.innerHTML = '<option value="">---------</option>';
+            }
+        }
+
+        if (categoryField) {
+            categoryField.addEventListener('change', function () {
+                fetchTypesByCategory(this.value, mainTypeField);
+            });
+        }
+
+        if (additionalCategoryField) {
+            additionalCategoryField.addEventListener('change', function () {
+                fetchTypesByCategory(this.value, additionalTypeField);
+            });
+        }
+
+        if (addAdditionalTypeButton) {
+            addAdditionalTypeButton.addEventListener('click', function () {
+                additionalTypesContainer.style.display = additionalTypesContainer.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+
+        if (addPhotoButton) {
+            let photoIndex = {{ photo_formset.total_form_count }};
+            addPhotoButton.addEventListener('click', function () {
+                const newPhotoEntry = document.createElement('div');
+                newPhotoEntry.classList.add('photo-entry', 'd-flex');
+                newPhotoEntry.innerHTML = `
+                    <input type="file" name="photo-${photoIndex}-image" class="form-control me-2" />
+                    <span class="form-check-label mt-2">${photoIndex === 0 ? 'Основная' : 'Дополнительная'}</span>
+                `;
+                photoContainer.appendChild(newPhotoEntry);
+                photoIndex++;
+            });
+        }
+
+        if (addCategoryTypeButton) {
+            let categoryIndex = 0;
+            addCategoryTypeButton.addEventListener('click', function () {
+                if (checkDuplicateTypes()) {
+                    alert('Нельзя выбрать одинаковые типы.');
+                    return;
+                }
+
+                const newCategoryEntry = document.createElement('div');
+                newCategoryEntry.classList.add('category-entry', 'd-flex');
+                newCategoryEntry.innerHTML = `
+                    <div class="me-2 flex-fill">
+                        <label class="form-label" for="id_additional_category_${categoryIndex}">Категория</label>
+                        <select name="additional_category_${categoryIndex}" id="id_additional_category_${categoryIndex}" class="form-select">
+                            ${categoryField.innerHTML}
+                        </select>
+                    </div>
+                    <div class="flex-fill">
+                        <label class="form-label" for="id_additional_type_${categoryIndex}">Тип</label>
+                        <select name="additional_type_${categoryIndex}" id="id_additional_type_${categoryIndex}" class="form-select">
+                            ${mainTypeField.innerHTML}
+                        </select>
+                    </div>
+                `;
+                categoryContainer.appendChild(newCategoryEntry);
+                categoryIndex++;
+            });
+        }
+
+        if (addVideoButton) {
+            let videoIndex = {{ video_formset.total_form_count }};
+            addVideoButton.addEventListener('click', function () {
+                const newVideoEntry = document.createElement('div');
+                newVideoEntry.classList.add('video-entry', 'd-flex');
+                newVideoEntry.innerHTML = `
+                    <input type="url" name="video-${videoIndex}-video" placeholder="Ссылка на видео" class="form-control me-2" />
+                    <input type="text" name="video-${videoIndex}-description" placeholder="Описание" class="form-control me-2" />
+                `;
+                videoContainer.appendChild(newVideoEntry);
+                videoIndex++;
+            });
+        }
+
+        if (addLinkButton) {
+            let linkIndex = {{ link_formset.total_form_count }};
+            addLinkButton.addEventListener('click', function () {
+                const newLinkEntry = document.createElement('div');
+                newLinkEntry.classList.add('link-entry', 'd-flex');
+                newLinkEntry.innerHTML = `
+                    <input type="url" name="link-${linkIndex}-url" placeholder="Ссылка" class="form-control me-2" />
+                    <input type="text" name="link-${linkIndex}-description" placeholder="Описание" class="form-control me-2" />
+                `;
+                linkContainer.appendChild(newLinkEntry);
+                linkIndex++;
+            });
+        }
+    });
+</script>
+{% endblock %}

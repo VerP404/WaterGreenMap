@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Инициализация карты Leaflet
     var map = L.map('map').setView([55.755811, 37.617617], 5);
 
-    // Добавление тайл-слоев OpenStreetMap и спутникового слоя
     var streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -11,10 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
 
-    // Позиционирование элементов управления зумом
     map.zoomControl.setPosition('topright');
 
-    // Добавление элемента управления местоположением
     L.control.locate({
         position: 'topright',
         strings: {
@@ -25,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }).addTo(map);
 
-    // Добавление элемента управления для переключения между уличной и спутниковой картой
     var controlLayers = L.control.layers({
         'карта 1': streetLayer,
         'карта 2': satelliteLayer
@@ -33,8 +28,29 @@ document.addEventListener('DOMContentLoaded', function () {
         position: 'topright'
     }).addTo(map);
 
+    var selectedPoint = null;
+    var addProjectButton = document.getElementById('add-project-button');
+    var mapOverlay = document.getElementById('map-overlay');
+    var confirmPointBtn = document.getElementById('confirm-point-btn');
 
-    // Экспорт функций для внешнего использования
-    window.myMap = map;
+    function onMapClick(e) {
+        if (selectedPoint) {
+            map.removeLayer(selectedPoint);
+        }
+        selectedPoint = L.marker(e.latlng).addTo(map);
+        confirmPointBtn.style.display = 'block';
+    }
 
+    addProjectButton.addEventListener('click', function () {
+        mapOverlay.style.display = 'block';
+        map.getContainer().style.cursor = 'crosshair';
+        map.on('click', onMapClick);
+    });
+
+    confirmPointBtn.addEventListener('click', function () {
+        if (selectedPoint) {
+            var latlng = selectedPoint.getLatLng();
+            window.location.href = `/add_project/?lat=${latlng.lat}&lng=${latlng.lng}`;
+        }
+    });
 });
