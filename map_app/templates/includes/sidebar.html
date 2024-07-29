@@ -1,12 +1,12 @@
-<!-- templates/includes/sidebar.html -->
 {% load static %}
 <nav id="sidebar" class="sidebar js-sidebar">
     <div class="sidebar-content js-simplebar">
         <a class="sidebar-brand d-flex align-items-center" href="{% url 'map' %}">
             <img src="{% static 'img/logo/logo.png' %}" alt="Карта водно-зеленой инфраструктуры" class="img-fluid" style="width: 50px; height: 50px;">
             <span class="ms-2 display-5 font-weight-bold text-uppercase text-white">ВЗИК</span>
-       </a>
+        </a>
         <ul class="sidebar-nav">
+            {% if user.is_authenticated %}
             <li class="sidebar-header">
                 Профиль
             </li>
@@ -15,16 +15,29 @@
                     <i class="align-middle" data-feather="user"></i> <span class="align-middle">Профиль</span>
                 </a>
             </li>
-            <li class="sidebar-item {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
-                <a class="sidebar-link" href="{% url 'map' %}">
+            <li class="sidebar-item">
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="sidebar-link btn btn-link">
+                        <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">Выйти</span>
+                    </button>
+                </form>
+            </li>
+            {% else %}
+            <li class="sidebar-header">
+                Авторизация
+            </li>
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'signin' %}">
                     <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Войти</span>
                 </a>
             </li>
-            <li class="sidebar-item {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
-                <a class="sidebar-link" href="{% url 'map' %}">
-                    <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Выйти</span>
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="{% url 'signup' %}">
+                    <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Зарегистрироваться</span>
                 </a>
             </li>
+            {% endif %}
 
             <li class="sidebar-header">
                 Меню сайта
@@ -83,15 +96,44 @@
             </li>
         </ul>
         <div class="sidebar-cta">
-            <div class="sidebar-cta-content">
-                <strong class="d-inline-block mb-2">Проект курирует</strong>
-                <div class="mb-3 text-sm">
-                    Гильдия ландшафтных инженеров
-                </div>
-                <div class="d-grid">
-                    <a href="https://laenguild.org/" class="btn btn-primary">Узнать больше</a>
-                </div>
+            <div class="sidebar-cta-content text-center">
+                <a href="https://laenguild.org/" target="_blank">
+                    <img src="{% static 'img/logo/Logo_lanit.png' %}" alt="Lanit Logo" class="img-fluid">
+                </a>
             </div>
         </div>
     </div>
 </nav>
+
+<style>
+    .navbar-brand {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .navbar-brand-full {
+        display: inline;
+    }
+
+    .navbar-brand-short {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .navbar-brand-full {
+            display: none;
+        }
+
+        .navbar-brand-short {
+            display: inline;
+        }
+    }
+
+    .btn-link {
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        text-decoration: none;
+    }
+</style>

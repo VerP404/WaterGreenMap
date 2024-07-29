@@ -1,8 +1,10 @@
+# map_app/views.py
+
 from django.shortcuts import render
 
 
 def map(request):
-    return render(request, 'map.html')
+    return render(request, 'pages/map.html')
 
 
 def profile_view(request):
