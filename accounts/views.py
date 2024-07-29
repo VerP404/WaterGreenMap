@@ -1,17 +1,20 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
 class SignUpView(CreateView):
-    model = User
-    form_class = UserCreationForm
+    form_class = CustomUserCreationForm
     template_name = 'registration/signup.html'
-    success_url = reverse_lazy('signin')
+    success_url = reverse_lazy('map')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        return response
 
 class SignInView(LoginView):
     template_name = 'registration/signin.html'
+    authentication_form = CustomAuthenticationForm
     success_url = reverse_lazy('map')
 
 class SignOutView(LogoutView):
