@@ -23,8 +23,7 @@ def project_list_view(request):
     return render(request, 'pages/project_list.html')
 
 
-# Настройка логгера
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('project')
 
 
 @login_required
@@ -41,6 +40,8 @@ def add_project(request):
             project.latitude = request.POST.get('latitude')
             project.longitude = request.POST.get('longitude')
             project.save()
+
+            logger.debug(f"Project '{project.title}' saved successfully")
 
             # Создание папки для фотографий проекта
             project_folder = os.path.join(settings.MEDIA_ROOT, 'photos', str(project.id))
@@ -62,8 +63,10 @@ def add_project(request):
                         for chunk in original_file.chunks():
                             destination.write(chunk)
 
-                    photo.image = os.path.join('fotos', str(project.id), filename)
+                    photo.image = os.path.join('photos', str(project.id), filename)
                     photo.save()
+
+                    logger.debug(f"Photo '{photo.image}' for project '{project.title}' saved successfully")
 
             # Сохранение видео
             for video_form in video_formset:
@@ -71,6 +74,7 @@ def add_project(request):
                     video = video_form.save(commit=False)
                     video.project = project
                     video.save()
+                    logger.debug(f"Video '{video.video}' for project '{project.title}' saved successfully")
 
             # Сохранение ссылок
             for link_form in link_formset:
@@ -78,10 +82,15 @@ def add_project(request):
                     link = link_form.save(commit=False)
                     link.project = project
                     link.save()
+                    logger.debug(f"Link '{link.url}' for project '{project.title}' saved successfully")
 
             messages.success(request, 'Проект успешно добавлен!')
             return redirect('project_list')
         else:
+            logger.error(f"Project Form errors: {form.errors}")
+            logger.error(f"Photo Formset errors: {photo_formset.errors}")
+            logger.error(f"Video Formset errors: {video_formset.errors}")
+            logger.error(f"Link Formset errors: {link_formset.errors}")
             messages.error(request, 'Произошла ошибка при добавлении проекта. Пожалуйста, проверьте введенные данные.')
 
     else:
