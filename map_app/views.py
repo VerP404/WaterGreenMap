@@ -1,19 +1,46 @@
+import json
 import logging
 import os
 
 from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from WaterGreenMap import settings
 from map_app.forms import ProjectForm, PhotoFormSet, VideoFormSet, LinkFormSet
-from map_app.models import Type, Link, Video, Photo
+from map_app.models import Type, Link, Video, Photo, Project, Category
 from django.contrib import messages
 
 
 def map(request):
-    return render(request, 'pages/map.html')
+    categories = Category.objects.all()
+    types = Type.objects.all()
 
+    filtered_projects = Project.objects.filter(is_published=True).select_related('main_type', 'main_type__category')
+
+    category_ids = request.GET.get('categories', '').split(',')
+    type_ids = request.GET.get('types', '').split(',')
+
+    if category_ids != ['']:
+        filtered_projects = filtered_projects.filter(main_type__category_id__in=category_ids)
+
+    if type_ids != ['']:
+        filtered_projects = filtered_projects.filter(main_type_id__in=type_ids)
+
+    projects_data = json.dumps(
+        list(filtered_projects.values(
+            'title', 'description', 'latitude', 'longitude',
+            'main_type__color', 'main_type__category__color'
+        )),
+        cls=DjangoJSONEncoder
+    )
+
+    return render(request, 'pages/map.html', {
+        'projects_data': projects_data,
+        'categories': categories,
+        'types': types
+    })
 
 def profile_view(request):
     return render(request, 'pages/profile.html')

@@ -53,4 +53,36 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = `/add_project/?lat=${latlng.lat}&lng=${latlng.lng}`;
         }
     });
+
+    function createDropIcon(fillColor, strokeColor) {
+        return L.divIcon({
+            html: `
+                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C9.82 0 4 9.92 4 13.92 4 17.74 7.22 21 12 21s8-3.26 8-7.08C20 9.92 14.18 0 12 0z"
+                          fill="${fillColor}" stroke="${strokeColor}" stroke-width="2"/>
+                </svg>`,
+            className: '',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24]
+        });
+    }
+
+    // Создание кластера
+    var markers = L.markerClusterGroup();
+
+    // Добавление маркеров на карту
+    if (projects.length > 0) {
+        projects.forEach(function (project) {
+            var fillColor = project.main_type__color;
+            var strokeColor = project.main_type__category__color;
+            var marker = L.marker([project.latitude, project.longitude], {
+                icon: createDropIcon(fillColor, strokeColor)
+            });
+            marker.bindPopup(`<b>${project.title}</b><br>${project.description}`);
+            markers.addLayer(marker);
+        });
+    }
+
+    // Добавление кластера на карту
+    map.addLayer(markers);
 });

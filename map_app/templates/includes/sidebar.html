@@ -7,9 +7,7 @@
         </a>
         <ul class="sidebar-nav">
             {% if user.is_authenticated %}
-            <li class="sidebar-header">
-                Профиль
-            </li>
+            <li class="sidebar-header">Профиль</li>
             <li class="sidebar-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
                 <a class="sidebar-link" href="{% url 'profile' %}">
                     <i class="align-middle" data-feather="user"></i> <span class="align-middle">Профиль</span>
@@ -24,9 +22,7 @@
                 </form>
             </li>
             {% else %}
-            <li class="sidebar-header">
-                Авторизация
-            </li>
+            <li class="sidebar-header">Авторизация</li>
             <li class="sidebar-item">
                 <a class="sidebar-link" href="{% url 'signin' %}">
                     <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Войти</span>
@@ -39,9 +35,7 @@
             </li>
             {% endif %}
 
-            <li class="sidebar-header">
-                Меню сайта
-            </li>
+            <li class="sidebar-header">Меню сайта</li>
             <li class="sidebar-item {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
                 <a class="sidebar-link" href="{% url 'map' %}">
                     <i class="align-middle" data-feather="map"></i> <span class="align-middle">Карта</span>
@@ -54,44 +48,32 @@
             </li>
             <li class="sidebar-item {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
                 <a class="sidebar-link" href="{% url 'map' %}">
-                    <i class="align-middle" data-feather="check-square"></i> <span class="align-middle">О проекте</span>
+                    <i class="align-middle" data-feather="info"></i> <span class="align-middle">О проекте</span>
                 </a>
             </li>
+            
             <li class="sidebar-header">Фильтр по проектам</li>
-            <li class="sidebar-item">
-                <a class="sidebar-link" data-bs-toggle="collapse" data-bs-target="#submenu-green-management"
-                   aria-expanded="false">
-                    <i class="align-middle" data-feather="archive"></i> <span
-                        class="align-middle">Водный менеджмент</span>
-                </a>
-                <ul id="submenu-green-management" class="sidebar-dropdown list-unstyled collapse">
-                    <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="align-middle"
-                                                                                 data-feather="archive"></i> Дождевой
-                        сад</a></li>
-                    <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="align-middle"
-                                                                                 data-feather="archive"></i>
-                        Биодренажная канава</a></li>
-                    <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="align-middle"
-                                                                                 data-feather="archive"></i> Зеленая
-                        крыша</a></li>
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link" data-bs-toggle="collapse" data-bs-target="#submenu-biodiversity"
-                   aria-expanded="false">
-                    <i class="align-middle" data-feather="droplet"></i> <span
-                        class="align-middle">Биоразнообразие</span>
-                </a>
-                <ul id="submenu-biodiversity" class="sidebar-dropdown list-unstyled collapse">
-                    <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="align-middle"
-                                                                                 data-feather="droplet"></i> Тип подменю
-                        1</a></li>
-                    <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="align-middle"
-                                                                                 data-feather="droplet"></i> Тип подменю
-                        2</a></li>
-                    <li class="sidebar-item"><a class="sidebar-link" href="#"><i class="align-middle"
-                                                                                 data-feather="droplet"></i> Тип подменю
-                        3</a></li>
+<li class="sidebar-item">
+                <button id="reset-filters" class="btn btn-secondary w-100 mb-3">Сбросить фильтры</button>
+                <ul class="sidebar-dropdown list-unstyled">
+                    {% for category in categories %}
+                    <li class="sidebar-item">
+                        <a class="sidebar-link category-filter" data-category-id="{{ category.id }}">
+                            <i class="align-middle" style="color: {{ category.color }};" data-feather="archive"></i> <span class="align-middle">{{ category.name }}</span>
+                        </a>
+                        <ul class="list-unstyled">
+                            {% for type in types %}
+                                {% if type.category.id == category.id %}
+                                <li class="sidebar-item">
+                                    <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
+                                        <i class="align-middle" style="color: {{ type.color }};" data-feather="circle"></i> {{ type.name }}
+                                    </a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
                 </ul>
             </li>
         </ul>
@@ -104,6 +86,52 @@
         </div>
     </div>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Сбросить фильтры
+        document.getElementById('reset-filters').addEventListener('click', function() {
+            document.querySelectorAll('.category-filter, .type-filter').forEach(function(link) {
+                link.classList.remove('active');
+            });
+            updateMap();
+        });
+
+        // Обновить карту при изменении фильтров
+        document.querySelectorAll('.category-filter').forEach(function(link) {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.category-filter').forEach(function(link) {
+                    link.classList.remove('active');
+                });
+                link.classList.add('active');
+                updateMap();
+            });
+        });
+
+        document.querySelectorAll('.type-filter').forEach(function(link) {
+            link.addEventListener('click', function() {
+                link.classList.toggle('active');
+                updateMap();
+            });
+        });
+
+        function updateMap() {
+            var selectedCategories = Array.from(document.querySelectorAll('.category-filter.active')).map(function(link) {
+                return link.dataset.categoryId;
+            });
+
+            var selectedTypes = Array.from(document.querySelectorAll('.type-filter.active')).map(function(link) {
+                return link.dataset.typeId;
+            });
+
+            var url = new URL(window.location.href);
+            url.searchParams.set('categories', selectedCategories.join(','));
+            url.searchParams.set('types', selectedTypes.join(','));
+
+            window.location.href = url.toString();
+        }
+    });
+</script>
 
 <style>
     .navbar-brand {
