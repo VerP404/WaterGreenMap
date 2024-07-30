@@ -42,6 +42,12 @@ def add_project(request):
             project.longitude = request.POST.get('longitude')
             project.save()
 
+            # Save the additional types excluding the main type
+            additional_types = form.cleaned_data['additional_types']
+            main_type = form.cleaned_data['main_type']
+            additional_types = additional_types.exclude(id=main_type.id)
+            project.additional_types.set(additional_types)
+
             photo_formset.instance = project
 
             video_formset.instance = project

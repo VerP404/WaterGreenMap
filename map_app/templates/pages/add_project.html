@@ -9,7 +9,7 @@
             <h1 class="h3 d-inline align-middle">Добавить проект</h1>
         </div>
         <div class="row">
-            <!-- Карточка Основная информация -->
+            <!-- Основная информация -->
             <div class="col-12 col-lg-6">
                 <div class="card">
                     <div class="card-header">
@@ -33,7 +33,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Карточка Категория объекта -->
+            <!-- Категория объекта -->
             <div class="col-12 col-lg-6">
                 <div class="card">
                     <div class="card-header">
@@ -60,7 +60,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Карточка Фотографии, видео, ссылки -->
+            <!-- Фотографии, видео, ссылки -->
             <div class="col-12 col-lg-12">
                 <div class="card">
                     <div class="card-header">
@@ -90,8 +90,8 @@
                             <div id="video-container">
                                 {% for form in video_formset %}
                                     <div class="video-entry d-flex">
-                                        <input type="url" name="{{ form.video.name }}" class="form-control" placeholder="Введите ссылку на видео" value="{{ form.initial.video }}">
-                                        <input type="text" name="{{ form.description.name }}" class="form-control" placeholder="Введите описание видео" value="{{ form.initial.description }}">
+                                        <input type="url" name="{{ form.prefix }}-video" class="form-control" placeholder="Введите ссылку на видео" value="{{ form.initial.video }}">
+                                        <input type="text" name="{{ form.prefix }}-description" class="form-control" placeholder="Введите описание видео" value="{{ form.initial.description }}">
                                         <div class="text-danger">{{ form.video.errors }}</div>
                                         <div class="text-danger">{{ form.description.errors }}</div>
                                     </div>
@@ -106,8 +106,8 @@
                             <div id="link-container">
                                 {% for form in link_formset %}
                                     <div class="link-entry d-flex">
-                                        <input type="url" name="{{ form.url.name }}" class="form-control" placeholder="Введите ссылку" value="{{ form.initial.url }}">
-                                        <input type="text" name="{{ form.description.name }}" class="form-control" placeholder="Введите описание ссылки" value="{{ form.initial.description }}">
+                                        <input type="url" name="{{ form.prefix }}-url" class="form-control" placeholder="Введите ссылку" value="{{ form.initial.url }}">
+                                        <input type="text" name="{{ form.prefix }}-description" class="form-control" placeholder="Введите описание ссылки" value="{{ form.initial.description }}">
                                         <div class="text-danger">{{ form.url.errors }}</div>
                                         <div class="text-danger">{{ form.description.errors }}</div>
                                     </div>
