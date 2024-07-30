@@ -31,9 +31,9 @@ logger = logging.getLogger(__name__)
 def add_project(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
-        photo_formset = PhotoFormSet(request.POST, request.FILES, queryset=Photo.objects.none())
-        video_formset = VideoFormSet(request.POST, queryset=Video.objects.none())
-        link_formset = LinkFormSet(request.POST, queryset=Link.objects.none())
+        photo_formset = PhotoFormSet(request.POST, request.FILES, instance=form.instance)
+        video_formset = VideoFormSet(request.POST, request.FILES, instance=form.instance)
+        link_formset = LinkFormSet(request.POST, request.FILES, instance=form.instance)
 
         if form.is_valid() and photo_formset.is_valid() and video_formset.is_valid() and link_formset.is_valid():
             project = form.save(commit=False)
@@ -42,13 +42,21 @@ def add_project(request):
             project.longitude = request.POST.get('longitude')
             project.save()
 
+            photo_formset.instance = project
+
+            video_formset.instance = project
+            video_formset.save()
+
+            link_formset.instance = project
+            link_formset.save()
+
             # Создание папки для фотографий проекта
             project_folder = os.path.join(settings.MEDIA_ROOT, 'photos', str(project.id))
             os.makedirs(project_folder, exist_ok=True)
 
-            # Сохранение фото
+            # Сохранение фото и переименование
             for index, photo_form in enumerate(photo_formset):
-                if photo_form.cleaned_data and 'image' in photo_form.cleaned_data:
+                if photo_form.cleaned_data.get('image'):
                     photo = photo_form.save(commit=False)
                     photo.project = project
                     if index == 0:
@@ -62,22 +70,8 @@ def add_project(request):
                         for chunk in original_file.chunks():
                             destination.write(chunk)
 
-                    photo.image = os.path.join('fotos', str(project.id), filename)
+                    photo.image = os.path.join('photos', str(project.id), filename)
                     photo.save()
-
-            # Сохранение видео
-            for video_form in video_formset:
-                if video_form.cleaned_data:
-                    video = video_form.save(commit=False)
-                    video.project = project
-                    video.save()
-
-            # Сохранение ссылок
-            for link_form in link_formset:
-                if link_form.cleaned_data:
-                    link = link_form.save(commit=False)
-                    link.project = project
-                    link.save()
 
             messages.success(request, 'Проект успешно добавлен!')
             return redirect('project_list')
@@ -86,9 +80,9 @@ def add_project(request):
 
     else:
         form = ProjectForm()
-        photo_formset = PhotoFormSet(queryset=Photo.objects.none())
-        video_formset = VideoFormSet(queryset=Video.objects.none())
-        link_formset = LinkFormSet(queryset=Link.objects.none())
+        photo_formset = PhotoFormSet(instance=form.instance)
+        video_formset = VideoFormSet(instance=form.instance)
+        link_formset = LinkFormSet(instance=form.instance)
 
     return render(request, 'pages/add_project.html', {
         'form': form,

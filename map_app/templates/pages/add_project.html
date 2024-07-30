@@ -21,10 +21,12 @@
                             <div class="mb-3">
                                 <label class="form-label" for="id_title">Название</label>
                                 {{ form.title }}
+                                <div class="text-danger">{{ form.title.errors }}</div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label" for="id_description">Описание</label>
                                 {{ form.description }}
+                                <div class="text-danger">{{ form.description.errors }}</div>
                             </div>
                             <input type="hidden" name="latitude" value="{{ request.GET.lat }}">
                             <input type="hidden" name="longitude" value="{{ request.GET.lng }}">
@@ -44,10 +46,12 @@
                                     <div class="me-2 flex-fill">
                                         <label class="form-label" for="id_category">Категория</label>
                                         {{ form.category }}
+                                        <div class="text-danger">{{ form.category.errors }}</div>
                                     </div>
                                     <div class="flex-fill">
                                         <label class="form-label" for="id_main_type">Основной тип</label>
                                         {{ form.main_type }}
+                                        <div class="text-danger">{{ form.main_type.errors }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -70,19 +74,14 @@
                         <!-- Фотографии -->
                         <div class="mb-3">
                             <label class="form-label">Фотографии</label>
-                            <div id="photo-container">
+                            <div class="upload-container">
                                 {% for form in photo_formset %}
-                                    <div class="photo-entry d-flex">
-                                        <input type="file" name="photo-{{ forloop.counter0 }}-image" class="form-control me-2" />
-                                        {% if forloop.first %}
-                                            <span class="form-check-label mt-2">Основная</span>
-                                        {% else %}
-                                            <span class="form-check-label mt-2">Дополнительная</span>
-                                        {% endif %}
+                                    <div class="upload-box">
+                                        {{ form.image }}
+                                        <span class="remove">X</span>
                                     </div>
                                 {% endfor %}
                             </div>
-                            <button type="button" id="add-photo" class="btn btn-secondary mt-2">Добавить фотографию</button>
                         </div>
                         <hr class="my-0" />
                         <!-- Видео -->
@@ -91,8 +90,10 @@
                             <div id="video-container">
                                 {% for form in video_formset %}
                                     <div class="video-entry d-flex">
-                                        <input type="url" name="video-{{ forloop.counter0 }}-video" placeholder="Ссылка на видео" class="form-control me-2" />
-                                        <input type="text" name="video-{{ forloop.counter0 }}-description" placeholder="Описание" class="form-control me-2" />
+                                        <input type="url" name="{{ form.video.name }}" class="form-control" placeholder="Введите ссылку на видео" value="{{ form.initial.video }}">
+                                        <input type="text" name="{{ form.description.name }}" class="form-control" placeholder="Введите описание видео" value="{{ form.initial.description }}">
+                                        <div class="text-danger">{{ form.video.errors }}</div>
+                                        <div class="text-danger">{{ form.description.errors }}</div>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -105,8 +106,10 @@
                             <div id="link-container">
                                 {% for form in link_formset %}
                                     <div class="link-entry d-flex">
-                                        <input type="url" name="link-{{ forloop.counter0 }}-url" placeholder="Ссылка" class="form-control me-2" />
-                                        <input type="text" name="link-{{ forloop.counter0 }}-description" placeholder="Описание" class="form-control me-2" />
+                                        <input type="url" name="{{ form.url.name }}" class="form-control" placeholder="Введите ссылку" value="{{ form.initial.url }}">
+                                        <input type="text" name="{{ form.description.name }}" class="form-control" placeholder="Введите описание ссылки" value="{{ form.initial.description }}">
+                                        <div class="text-danger">{{ form.url.errors }}</div>
+                                        <div class="text-danger">{{ form.description.errors }}</div>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -129,6 +132,28 @@
 {% block extra_scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
+        photoInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.previousElementSibling && this.previousElementSibling.remove();
+                        this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+
+        document.querySelectorAll('.upload-box .remove').forEach(remove => {
+            remove.addEventListener('click', function () {
+                const box = this.parentElement;
+                box.querySelector('img') && box.querySelector('img').remove();
+                box.querySelector('input').value = '';
+            });
+        });
+
         const categoryField = document.getElementById('id_category');
         const mainTypeField = document.getElementById('id_main_type');
         const additionalCategoryField = document.getElementById('id_additional_category');
@@ -137,18 +162,10 @@
         const addAdditionalTypeButton = document.getElementById('add-additional-type');
         const categoryContainer = document.getElementById('category-container');
         const addCategoryTypeButton = document.getElementById('add-category-type');
-        const photoContainer = document.getElementById('photo-container');
-        const addPhotoButton = document.getElementById('add-photo');
         const videoContainer = document.getElementById('video-container');
         const addVideoButton = document.getElementById('add-video');
         const linkContainer = document.getElementById('link-container');
         const addLinkButton = document.getElementById('add-link');
-
-        function checkDuplicateTypes() {
-            const typeFields = document.querySelectorAll('select[name^="additional_type_"]');
-            const types = Array.from(typeFields).map(field => field.value);
-            return new Set(types).size !== types.length;
-        }
 
         function fetchTypesByCategory(categoryId, targetField) {
             if (categoryId) {
@@ -184,28 +201,9 @@
             });
         }
 
-        if (addPhotoButton) {
-            let photoIndex = {{ photo_formset.total_form_count }};
-            addPhotoButton.addEventListener('click', function () {
-                const newPhotoEntry = document.createElement('div');
-                newPhotoEntry.classList.add('photo-entry', 'd-flex');
-                newPhotoEntry.innerHTML = `
-                    <input type="file" name="photo-${photoIndex}-image" class="form-control me-2" />
-                    <span class="form-check-label mt-2">${photoIndex === 0 ? 'Основная' : 'Дополнительная'}</span>
-                `;
-                photoContainer.appendChild(newPhotoEntry);
-                photoIndex++;
-            });
-        }
-
         if (addCategoryTypeButton) {
             let categoryIndex = 0;
             addCategoryTypeButton.addEventListener('click', function () {
-                if (checkDuplicateTypes()) {
-                    alert('Нельзя выбрать одинаковые типы.');
-                    return;
-                }
-
                 const newCategoryEntry = document.createElement('div');
                 newCategoryEntry.classList.add('category-entry', 'd-flex');
                 newCategoryEntry.innerHTML = `
@@ -227,33 +225,60 @@
             });
         }
 
-        if (addVideoButton) {
-            let videoIndex = {{ video_formset.total_form_count }};
-            addVideoButton.addEventListener('click', function () {
-                const newVideoEntry = document.createElement('div');
-                newVideoEntry.classList.add('video-entry', 'd-flex');
-                newVideoEntry.innerHTML = `
-                    <input type="url" name="video-${videoIndex}-video" placeholder="Ссылка на видео" class="form-control me-2" />
-                    <input type="text" name="video-${videoIndex}-description" placeholder="Описание" class="form-control me-2" />
-                `;
-                videoContainer.appendChild(newVideoEntry);
-                videoIndex++;
-            });
-        }
+        addVideoButton.addEventListener('click', function () {
+            const newVideoEntry = document.createElement('div');
+            newVideoEntry.classList.add('video-entry', 'd-flex');
+            newVideoEntry.innerHTML = `
+                <input type="url" name="video-${videoContainer.children.length}-video" placeholder="Ссылка на видео" class="form-control me-2" />
+                <input type="text" name="video-${videoContainer.children.length}-description" placeholder="Описание" class="form-control me-2" />
+            `;
+            videoContainer.appendChild(newVideoEntry);
+        });
 
-        if (addLinkButton) {
-            let linkIndex = {{ link_formset.total_form_count }};
-            addLinkButton.addEventListener('click', function () {
-                const newLinkEntry = document.createElement('div');
-                newLinkEntry.classList.add('link-entry', 'd-flex');
-                newLinkEntry.innerHTML = `
-                    <input type="url" name="link-${linkIndex}-url" placeholder="Ссылка" class="form-control me-2" />
-                    <input type="text" name="link-${linkIndex}-description" placeholder="Описание" class="form-control me-2" />
-                `;
-                linkContainer.appendChild(newLinkEntry);
-                linkIndex++;
-            });
-        }
+        addLinkButton.addEventListener('click', function () {
+            const newLinkEntry = document.createElement('div');
+            newLinkEntry.classList.add('link-entry', 'd-flex');
+            newLinkEntry.innerHTML = `
+                <input type="url" name="link-${linkContainer.children.length}-url" placeholder="Ссылка" class="form-control me-2" />
+                <input type="text" name="link-${linkContainer.children.length}-description" placeholder="Описание" class="form-control me-2" />
+            `;
+            linkContainer.appendChild(newLinkEntry);
+        });
     });
 </script>
+<style>
+    .upload-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .upload-box {
+        width: 120px;
+        height: 120px;
+        border: 2px solid #000;
+        margin: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .upload-box img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    .upload-box input {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .upload-box .remove {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #fff;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+</style>
 {% endblock %}

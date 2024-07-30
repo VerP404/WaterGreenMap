@@ -23,6 +23,25 @@ class CategoryAdmin(admin.ModelAdmin, ColorAdminMixin):
     list_editable = ('color',)
     inlines = [TypeInline]
 
+class PhotoInline(admin.TabularInline):
+    model = Photo
+    extra = 1
+    readonly_fields = ('image_tag',)
+
+    def image_tag(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="width: 100px; height: auto;" />', obj.image.url)
+        return "-"
+    image_tag.short_description = 'Preview'
+
+class VideoInline(admin.TabularInline):
+    model = Video
+    extra = 1
+
+class LinkInline(admin.TabularInline):
+    model = Link
+    extra = 1
+
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ('project', 'image_tag', 'description', 'is_main')
@@ -48,6 +67,7 @@ class ProjectAdmin(admin.ModelAdmin):
     list_filter = ('main_type', 'user', 'is_published')
     search_fields = ('title', 'description', 'user__username')
     list_editable = ('is_published',)
+    inlines = [PhotoInline, VideoInline, LinkInline]
 
     def get_inline_instances(self, request, obj=None):
         if not obj:
