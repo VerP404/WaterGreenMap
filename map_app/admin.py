@@ -1,29 +1,75 @@
 from django.contrib import admin
-from .models import Category, Type, Project
+from .models import Category, Type, Project, Photo, Video, Link
 from django.utils.html import format_html
 
 class ColorAdminMixin:
+    class Media:
+        js = ('admin/js/color_preview.js',)  # Путь к вашему JS файлу
+
     def color_display(self, obj):
         return format_html(
-            '<div style="width: 20px; height: 20px; background-color: {}; border: 1px solid #000;"></div>',
+            '<div class="color-preview" style="width: 20px; height: 20px; background-color: {}; border: 1px solid #000;"></div>',
             obj.color
         )
     color_display.short_description = 'Цвет'
+
+class TypeInline(admin.TabularInline):
+    model = Type
+    extra = 1
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin, ColorAdminMixin):
     list_display = ('name', 'description', 'color_display', 'color')
     list_editable = ('color',)
+    inlines = [TypeInline]
 
-@admin.register(Type)
-class TypeAdmin(admin.ModelAdmin, ColorAdminMixin):
-    list_display = ('name', 'description', 'category', 'color_display', 'color')
-    list_editable = ('color',)
-    list_filter = ('category',)
+@admin.register(Photo)
+class PhotoAdmin(admin.ModelAdmin):
+    list_display = ('project', 'image_tag', 'description', 'is_main')
+    readonly_fields = ('image_tag',)
+
+    def image_tag(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="width: 100px; height: auto;" />', obj.image.url)
+        return "-"
+    image_tag.short_description = 'Preview'
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ('project', 'video', 'description')
+
+@admin.register(Link)
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ('project', 'url', 'description')
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('title', 'main_type', 'user', 'is_published', 'created_at')
+    list_display = ('title', 'main_type', 'user', 'is_published', 'created_at', 'image_preview', 'video_links', 'additional_links')
     list_filter = ('main_type', 'user', 'is_published')
     search_fields = ('title', 'description', 'user__username')
     list_editable = ('is_published',)
+
+    def get_inline_instances(self, request, obj=None):
+        if not obj:
+            return list()
+        return super(ProjectAdmin, self).get_inline_instances(request, obj)
+
+    def image_preview(self, obj):
+        photos = obj.photos.all()
+        if photos.exists():
+            photo = photos.first()
+            return format_html('<img src="{}" style="width: 100px; height: auto;" />', photo.image.url)
+        return "No Image"
+    image_preview.short_description = "Preview Image"
+
+    def video_links(self, obj):
+        videos = obj.videos.all()
+        links = [format_html('<a href="{}" target="_blank">{}</a>', video.video, video.description) for video in videos]
+        return format_html("<br>".join(links))
+    video_links.short_description = "Video Links"
+
+    def additional_links(self, obj):
+        links = obj.links.all()
+        additional_links = [format_html('<a href="{}" target="_blank">{}</a>', link.url, link.description) for link in links]
+        return format_html("<br>".join(additional_links))
+    additional_links.short_description = "Additional Links"

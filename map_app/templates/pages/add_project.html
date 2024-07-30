@@ -26,6 +26,8 @@
                                 <label class="form-label" for="id_description">Описание</label>
                                 {{ form.description }}
                             </div>
+                            <input type="hidden" name="latitude" value="{{ request.GET.lat }}">
+                            <input type="hidden" name="longitude" value="{{ request.GET.lng }}">
                     </div>
                 </div>
             </div>
