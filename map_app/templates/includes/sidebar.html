@@ -51,9 +51,9 @@
                     <i class="align-middle" data-feather="info"></i> <span class="align-middle">О проекте</span>
                 </a>
             </li>
-            
+
             <li class="sidebar-header">Фильтр по проектам</li>
-<li class="sidebar-item">
+            <li class="sidebar-item">
                 <button id="reset-filters" class="btn btn-secondary w-100 mb-3">Сбросить фильтры</button>
                 <ul class="sidebar-dropdown list-unstyled">
                     {% for category in categories %}
@@ -61,15 +61,13 @@
                         <a class="sidebar-link category-filter" data-category-id="{{ category.id }}">
                             <i class="align-middle" style="color: {{ category.color }};" data-feather="archive"></i> <span class="align-middle">{{ category.name }}</span>
                         </a>
-                        <ul class="list-unstyled">
-                            {% for type in types %}
-                                {% if type.category.id == category.id %}
-                                <li class="sidebar-item">
-                                    <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
-                                        <i class="align-middle" style="color: {{ type.color }};" data-feather="circle"></i> {{ type.name }}
-                                    </a>
-                                </li>
-                                {% endif %}
+                        <ul class="list-unstyled" style="display: none;">
+                            {% for type in category.types.all %}
+                            <li class="sidebar-item">
+                                <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
+                                    <i class="align-middle" style="color: {{ type.color }};" data-feather="circle"></i> {{ type.name }}
+                                </a>
+                            </li>
                             {% endfor %}
                         </ul>
                     </li>
@@ -89,25 +87,43 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Показать/скрыть типы при клике на категорию
+        document.querySelectorAll('.category-filter').forEach(function(link) {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.category-filter').forEach(function(otherLink) {
+                    if (otherLink !== link) {
+                        otherLink.classList.remove('active');
+                        var sublist = otherLink.nextElementSibling;
+                        if (sublist) {
+                            sublist.style.display = 'none';
+                        }
+                    }
+                });
+                var sublist = link.nextElementSibling;
+                if (sublist) {
+                    if (sublist.style.display === 'none' || sublist.style.display === '') {
+                        sublist.style.display = 'block';
+                    } else {
+                        sublist.style.display = 'none';
+                    }
+                }
+                link.classList.toggle('active');
+            });
+        });
+
         // Сбросить фильтры
         document.getElementById('reset-filters').addEventListener('click', function() {
             document.querySelectorAll('.category-filter, .type-filter').forEach(function(link) {
                 link.classList.remove('active');
+                var sublist = link.nextElementSibling;
+                if (sublist) {
+                    sublist.style.display = 'none';
+                }
             });
             updateMap();
         });
 
         // Обновить карту при изменении фильтров
-        document.querySelectorAll('.category-filter').forEach(function(link) {
-            link.addEventListener('click', function() {
-                document.querySelectorAll('.category-filter').forEach(function(link) {
-                    link.classList.remove('active');
-                });
-                link.classList.add('active');
-                updateMap();
-            });
-        });
-
         document.querySelectorAll('.type-filter').forEach(function(link) {
             link.addEventListener('click', function() {
                 link.classList.toggle('active');
@@ -124,14 +140,31 @@
                 return link.dataset.typeId;
             });
 
-            var url = new URL(window.location.href);
-            url.searchParams.set('categories', selectedCategories.join(','));
-            url.searchParams.set('types', selectedTypes.join(','));
+            fetch(`/update_map/?categories=${selectedCategories.join(',')}&types=${selectedTypes.join(',')}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateMarkers(data);
+                });
+        }
 
-            window.location.href = url.toString();
+        function updateMarkers(data) {
+            if (typeof markers !== 'undefined') {
+                markers.clearLayers();
+                data.forEach(function (project) {
+                    var fillColor = project.main_type__color;
+                    var strokeColor = project.main_type__category__color;
+                    var marker = L.marker([project.latitude, project.longitude], {
+                        icon: createDropIcon(fillColor, strokeColor)
+                    });
+                    marker.bindPopup(`<b>${project.title}</b><br>${project.description}`);
+                    markers.addLayer(marker);
+                });
+            }
         }
     });
 </script>
+
+
 
 <style>
     .navbar-brand {

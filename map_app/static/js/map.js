@@ -67,10 +67,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Создание кластера
     var markers = L.markerClusterGroup();
 
-    // Добавление маркеров на карту
     if (projects.length > 0) {
         projects.forEach(function (project) {
             var fillColor = project.main_type__color;
@@ -83,6 +81,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Добавление кластера на карту
     map.addLayer(markers);
+
+    window.updateMarkers = function(data) {
+        markers.clearLayers();
+        data.forEach(function (project) {
+            var fillColor = project.main_type__color;
+            var strokeColor = project.main_type__category__color;
+            var marker = L.marker([project.latitude, project.longitude], {
+                icon: createDropIcon(fillColor, strokeColor)
+            });
+            marker.bindPopup(`<b>${project.title}</b><br>${project.description}`);
+            markers.addLayer(marker);
+        });
+    }
 });

@@ -3,13 +3,14 @@ from django.urls import path, include
 from django.conf import settings
 
 from map_app.views import map, profile_view, project_list_view, add_project, get_types_by_category, \
-    get_types_by_categories
+    get_types_by_categories, update_map
 from django.conf.urls.static import static
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('accounts/', include('accounts.urls')),
                   path('', map, name='map'),
+                  path('update_map/', update_map, name='update_map'),
                   path('profile/', profile_view, name='profile'),
                   path('project_list/', project_list_view, name='project_list'),
                   path('add_project/', add_project, name='add_project'),

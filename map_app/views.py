@@ -14,7 +14,7 @@ from django.contrib import messages
 
 
 def map(request):
-    categories = Category.objects.all()
+    categories = Category.objects.all().prefetch_related('types')
     types = Type.objects.all()
 
     filtered_projects = Project.objects.filter(is_published=True).select_related('main_type', 'main_type__category')
@@ -22,10 +22,10 @@ def map(request):
     category_ids = request.GET.get('categories', '').split(',')
     type_ids = request.GET.get('types', '').split(',')
 
-    if category_ids != ['']:
+    if category_ids != [''] and category_ids[0]:
         filtered_projects = filtered_projects.filter(main_type__category_id__in=category_ids)
 
-    if type_ids != ['']:
+    if type_ids != [''] and type_ids[0]:
         filtered_projects = filtered_projects.filter(main_type_id__in=type_ids)
 
     projects_data = json.dumps(
@@ -41,6 +41,25 @@ def map(request):
         'categories': categories,
         'types': types
     })
+
+def update_map(request):
+    category_ids = request.GET.get('categories', '').split(',')
+    type_ids = request.GET.get('types', '').split(',')
+
+    filtered_projects = Project.objects.filter(is_published=True).select_related('main_type', 'main_type__category')
+
+    if category_ids != [''] and category_ids[0]:
+        filtered_projects = filtered_projects.filter(main_type__category_id__in=category_ids)
+
+    if type_ids != [''] and type_ids[0]:
+        filtered_projects = filtered_projects.filter(main_type_id__in=type_ids)
+
+    projects_data = list(filtered_projects.values(
+        'title', 'description', 'latitude', 'longitude',
+        'main_type__color', 'main_type__category__color'
+    ))
+
+    return JsonResponse(projects_data, safe=False)
 
 
 @login_required
