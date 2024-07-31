@@ -1,19 +1,46 @@
+import json
 import logging
 import os
 
 from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from WaterGreenMap import settings
 from map_app.forms import ProjectForm, PhotoFormSet, VideoFormSet, LinkFormSet
-from map_app.models import Type, Link, Video, Photo
+from map_app.models import Type, Link, Video, Photo, Project, Category
 from django.contrib import messages
 
 
 def map(request):
-    return render(request, 'pages/map.html')
+    categories = Category.objects.all()
+    types = Type.objects.all()
 
+    filtered_projects = Project.objects.filter(is_published=True).select_related('main_type', 'main_type__category')
+
+    category_ids = request.GET.get('categories', '').split(',')
+    type_ids = request.GET.get('types', '').split(',')
+
+    if category_ids != ['']:
+        filtered_projects = filtered_projects.filter(main_type__category_id__in=category_ids)
+
+    if type_ids != ['']:
+        filtered_projects = filtered_projects.filter(main_type_id__in=type_ids)
+
+    projects_data = json.dumps(
+        list(filtered_projects.values(
+            'title', 'description', 'latitude', 'longitude',
+            'main_type__color', 'main_type__category__color'
+        )),
+        cls=DjangoJSONEncoder
+    )
+
+    return render(request, 'pages/map.html', {
+        'projects_data': projects_data,
+        'categories': categories,
+        'types': types
+    })
 
 def profile_view(request):
     return render(request, 'pages/profile.html')
@@ -23,16 +50,17 @@ def project_list_view(request):
     return render(request, 'pages/project_list.html')
 
 
-logger = logging.getLogger('project')
+# Настройка логгера
+logger = logging.getLogger(__name__)
 
 
 @login_required
 def add_project(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
-        photo_formset = PhotoFormSet(request.POST, request.FILES, queryset=Photo.objects.none())
-        video_formset = VideoFormSet(request.POST, queryset=Video.objects.none())
-        link_formset = LinkFormSet(request.POST, queryset=Link.objects.none())
+        photo_formset = PhotoFormSet(request.POST, request.FILES, instance=form.instance)
+        video_formset = VideoFormSet(request.POST, request.FILES, instance=form.instance)
+        link_formset = LinkFormSet(request.POST, request.FILES, instance=form.instance)
 
         if form.is_valid() and photo_formset.is_valid() and video_formset.is_valid() and link_formset.is_valid():
             project = form.save(commit=False)
@@ -41,15 +69,27 @@ def add_project(request):
             project.longitude = request.POST.get('longitude')
             project.save()
 
-            logger.debug(f"Project '{project.title}' saved successfully")
+            # Save the additional types excluding the main type
+            additional_types = form.cleaned_data['additional_types']
+            main_type = form.cleaned_data['main_type']
+            additional_types = additional_types.exclude(id=main_type.id)
+            project.additional_types.set(additional_types)
+
+            photo_formset.instance = project
+
+            video_formset.instance = project
+            video_formset.save()
+
+            link_formset.instance = project
+            link_formset.save()
 
             # Создание папки для фотографий проекта
             project_folder = os.path.join(settings.MEDIA_ROOT, 'photos', str(project.id))
             os.makedirs(project_folder, exist_ok=True)
 
-            # Сохранение фото
+            # Сохранение фото и переименование
             for index, photo_form in enumerate(photo_formset):
-                if photo_form.cleaned_data and 'image' in photo_form.cleaned_data:
+                if photo_form.cleaned_data.get('image'):
                     photo = photo_form.save(commit=False)
                     photo.project = project
                     if index == 0:
@@ -66,38 +106,16 @@ def add_project(request):
                     photo.image = os.path.join('photos', str(project.id), filename)
                     photo.save()
 
-                    logger.debug(f"Photo '{photo.image}' for project '{project.title}' saved successfully")
-
-            # Сохранение видео
-            for video_form in video_formset:
-                if video_form.cleaned_data:
-                    video = video_form.save(commit=False)
-                    video.project = project
-                    video.save()
-                    logger.debug(f"Video '{video.video}' for project '{project.title}' saved successfully")
-
-            # Сохранение ссылок
-            for link_form in link_formset:
-                if link_form.cleaned_data:
-                    link = link_form.save(commit=False)
-                    link.project = project
-                    link.save()
-                    logger.debug(f"Link '{link.url}' for project '{project.title}' saved successfully")
-
             messages.success(request, 'Проект успешно добавлен!')
             return redirect('project_list')
         else:
-            logger.error(f"Project Form errors: {form.errors}")
-            logger.error(f"Photo Formset errors: {photo_formset.errors}")
-            logger.error(f"Video Formset errors: {video_formset.errors}")
-            logger.error(f"Link Formset errors: {link_formset.errors}")
             messages.error(request, 'Произошла ошибка при добавлении проекта. Пожалуйста, проверьте введенные данные.')
 
     else:
         form = ProjectForm()
-        photo_formset = PhotoFormSet(queryset=Photo.objects.none())
-        video_formset = VideoFormSet(queryset=Video.objects.none())
-        link_formset = LinkFormSet(queryset=Link.objects.none())
+        photo_formset = PhotoFormSet(instance=form.instance)
+        video_formset = VideoFormSet(instance=form.instance)
+        link_formset = LinkFormSet(instance=form.instance)
 
     return render(request, 'pages/add_project.html', {
         'form': form,
