@@ -42,12 +42,17 @@ def map(request):
         'types': types
     })
 
+
+@login_required
 def profile_view(request):
-    return render(request, 'pages/profile.html')
+    user_projects = Project.objects.filter(user=request.user, is_published=True).select_related(
+        'main_type').prefetch_related('photos')
+    return render(request, 'pages/profile.html', {'projects': user_projects})
 
 
 def project_list_view(request):
-    return render(request, 'pages/project_list.html')
+    projects = Project.objects.filter(is_published=True).select_related('main_type', 'user').prefetch_related('photos')
+    return render(request, 'pages/project_list.html', {'projects': projects})
 
 
 # Настройка логгера

@@ -125,42 +125,42 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'),
-            'formatter': 'verbose'
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'project': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': os.path.join(BASE_DIR, 'debug.log'),
+#             'formatter': 'verbose'
+#         },
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple'
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file', 'console'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#         'project': {
+#             'handlers': ['file', 'console'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
