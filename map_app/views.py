@@ -91,6 +91,11 @@ def add_project(request):
             project.user = request.user
             project.latitude = request.POST.get('latitude')
             project.longitude = request.POST.get('longitude')
+
+            # Сохранение экосистемных услуг
+            ecosystem_services_desired = request.POST.getlist('ecosystem_services_desired')
+            project.ecosystem_services_desired = json.dumps(ecosystem_services_desired)
+
             project.save()
 
             # Save the additional types excluding the main type

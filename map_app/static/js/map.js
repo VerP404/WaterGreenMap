@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var markers = L.markerClusterGroup();
 
-    if (projects.length > 0) {
+    function loadMarkers(projects) {
         projects.forEach(function (project) {
             var fillColor = project.main_type__color;
             var strokeColor = project.main_type__category__color;
@@ -81,18 +81,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    loadMarkers(projects);
     map.addLayer(markers);
 
     window.updateMarkers = function(data) {
         markers.clearLayers();
-        data.forEach(function (project) {
-            var fillColor = project.main_type__color;
-            var strokeColor = project.main_type__category__color;
-            var marker = L.marker([project.latitude, project.longitude], {
-                icon: createDropIcon(fillColor, strokeColor)
-            });
-            marker.bindPopup(`<b>${project.title}</b><br>${project.description}`);
-            markers.addLayer(marker);
-        });
-    }
+        loadMarkers(data);
+    };
 });

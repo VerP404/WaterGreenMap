@@ -33,7 +33,22 @@ class Project(models.Model):
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    country = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    creation_year = models.CharField(max_length=4, blank=True, null=True)
+    design_year = models.CharField(max_length=4, blank=True, null=True)
+    project_author = models.CharField(max_length=255, blank=True, null=True)
+    project_description = models.TextField(blank=True, null=True)
+    additional_info = models.TextField(blank=True, null=True)
+    is_monitoring = models.BooleanField(default=False)
+    monitoring_parameters = models.TextField(blank=True, null=True)
+    monitoring_start_year = models.CharField(max_length=4, blank=True, null=True)
+    monitoring_equipment = models.CharField(max_length=255, blank=True, null=True)
+    monitoring_owner = models.CharField(max_length=255, blank=True, null=True)
+    is_data_open = models.BooleanField(default=False)
+    is_ecosystem_services_measured = models.BooleanField(default=False)
+    ecosystem_services_measured = models.TextField(blank=True, null=True)
+    ecosystem_services_desired = models.JSONField(blank=True, null=True, default=list)
     def __str__(self):
         return self.title
 

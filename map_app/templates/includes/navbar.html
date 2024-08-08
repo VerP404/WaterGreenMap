@@ -22,7 +22,7 @@
 
                 {% if user.is_authenticated %}
                     <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#" data-bs-toggle="dropdown">
-                        <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/avatars/avatar.jpg' %}{% endif %}" class="avatar img-fluid rounded me-1" alt="{{ user.get_full_name }}"/>
+                        <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/avatars/user.png' %}{% endif %}" class="avatar img-fluid rounded me-1" alt="{{ user.get_full_name }}"/>
                         <span class="text-dark">{{ user.last_name }} {{ user.first_name }}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end">

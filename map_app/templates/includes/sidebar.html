@@ -2,37 +2,38 @@
 <nav id="sidebar" class="sidebar js-sidebar">
     <div class="sidebar-content js-simplebar">
         <a class="sidebar-brand d-flex align-items-center" href="{% url 'map' %}">
-            <img src="{% static 'img/logo/logo.png' %}" alt="Карта водно-зеленой инфраструктуры" class="img-fluid" style="width: 50px; height: 50px;">
+            <img src="{% static 'img/logo/logo.png' %}" alt="Карта водно-зеленой инфраструктуры" class="img-fluid"
+                 style="width: 50px; height: 50px;">
             <span class="ms-2 display-5 font-weight-bold text-uppercase text-white">ВЗИК</span>
         </a>
         <ul class="sidebar-nav">
             {% if user.is_authenticated %}
-            <li class="sidebar-header">Профиль</li>
-            <li class="sidebar-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                <a class="sidebar-link" href="{% url 'profile' %}">
-                    <i class="align-middle" data-feather="user"></i> <span class="align-middle">Профиль</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="sidebar-link btn btn-link">
-                        <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">Выйти</span>
-                    </button>
-                </form>
-            </li>
+                <li class="sidebar-header">Профиль</li>
+                <li class="sidebar-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                    <a class="sidebar-link" href="{% url 'profile' %}">
+                        <i class="align-middle" data-feather="user"></i> <span class="align-middle">Профиль</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="sidebar-link btn btn-link">
+                            <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">Выйти</span>
+                        </button>
+                    </form>
+                </li>
             {% else %}
-            <li class="sidebar-header">Авторизация</li>
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'signin' %}">
-                    <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Войти</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a class="sidebar-link" href="{% url 'signup' %}">
-                    <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Зарегистрироваться</span>
-                </a>
-            </li>
+                <li class="sidebar-header">Авторизация</li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'signin' %}">
+                        <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Войти</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{% url 'signup' %}">
+                        <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Зарегистрироваться</span>
+                    </a>
+                </li>
             {% endif %}
 
             <li class="sidebar-header">Меню сайта</li>
@@ -57,20 +58,22 @@
                 <button id="reset-filters" class="btn btn-secondary w-100 mb-3">Сбросить фильтры</button>
                 <ul class="sidebar-dropdown list-unstyled">
                     {% for category in categories %}
-                    <li class="sidebar-item">
-                        <a class="sidebar-link category-filter" data-category-id="{{ category.id }}">
-                            <i class="align-middle" style="color: {{ category.color }};" data-feather="archive"></i> <span class="align-middle">{{ category.name }}</span>
-                        </a>
-                        <ul class="list-unstyled" style="display: none;">
-                            {% for type in category.types.all %}
-                            <li class="sidebar-item">
-                                <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
-                                    <i class="align-middle" style="color: {{ type.color }};" data-feather="circle"></i> {{ type.name }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link category-filter" data-category-id="{{ category.id }}">
+                                <i class="align-middle" style="color: {{ category.color }};" data-feather="archive"></i>
+                                <span class="align-middle">{{ category.name }}</span>
+                            </a>
+                            <ul class="list-unstyled" style="display: none;">
+                                {% for type in category.types.all %}
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
+                                            <i class="align-middle" style="color: {{ type.color }};"
+                                               data-feather="circle"></i> {{ type.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
                     {% endfor %}
                 </ul>
             </li>
@@ -86,11 +89,10 @@
 </nav>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Показать/скрыть типы при клике на категорию
-        document.querySelectorAll('.category-filter').forEach(function(link) {
-            link.addEventListener('click', function() {
-                document.querySelectorAll('.category-filter').forEach(function(otherLink) {
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.category-filter').forEach(function (link) {
+            link.addEventListener('click', function () {
+                document.querySelectorAll('.category-filter').forEach(function (otherLink) {
                     if (otherLink !== link) {
                         otherLink.classList.remove('active');
                         var sublist = otherLink.nextElementSibling;
@@ -108,12 +110,22 @@
                     }
                 }
                 link.classList.toggle('active');
+                updateMap();
             });
         });
 
-        // Сбросить фильтры
-        document.getElementById('reset-filters').addEventListener('click', function() {
-            document.querySelectorAll('.category-filter, .type-filter').forEach(function(link) {
+        document.querySelectorAll('.type-filter').forEach(function (link) {
+            link.addEventListener('click', function () {
+                document.querySelectorAll('.type-filter').forEach(function (otherLink) {
+                    otherLink.classList.remove('active');
+                });
+                link.classList.add('active');
+                updateMap();
+            });
+        });
+
+        document.getElementById('reset-filters').addEventListener('click', function () {
+            document.querySelectorAll('.category-filter, .type-filter').forEach(function (link) {
                 link.classList.remove('active');
                 var sublist = link.nextElementSibling;
                 if (sublist) {
@@ -123,47 +135,25 @@
             updateMap();
         });
 
-        // Обновить карту при изменении фильтров
-        document.querySelectorAll('.type-filter').forEach(function(link) {
-            link.addEventListener('click', function() {
-                link.classList.toggle('active');
-                updateMap();
-            });
-        });
-
         function updateMap() {
-            var selectedCategories = Array.from(document.querySelectorAll('.category-filter.active')).map(function(link) {
+            var selectedCategories = Array.from(document.querySelectorAll('.category-filter.active')).map(function (link) {
                 return link.dataset.categoryId;
             });
 
-            var selectedTypes = Array.from(document.querySelectorAll('.type-filter.active')).map(function(link) {
+            var selectedTypes = Array.from(document.querySelectorAll('.type-filter.active')).map(function (link) {
                 return link.dataset.typeId;
             });
 
             fetch(`/update_map/?categories=${selectedCategories.join(',')}&types=${selectedTypes.join(',')}`)
                 .then(response => response.json())
                 .then(data => {
-                    updateMarkers(data);
+                    if (typeof window.updateMarkers === 'function') {
+                        window.updateMarkers(data);
+                    }
                 });
-        }
-
-        function updateMarkers(data) {
-            if (typeof markers !== 'undefined') {
-                markers.clearLayers();
-                data.forEach(function (project) {
-                    var fillColor = project.main_type__color;
-                    var strokeColor = project.main_type__category__color;
-                    var marker = L.marker([project.latitude, project.longitude], {
-                        icon: createDropIcon(fillColor, strokeColor)
-                    });
-                    marker.bindPopup(`<b>${project.title}</b><br>${project.description}`);
-                    markers.addLayer(marker);
-                });
-            }
         }
     });
 </script>
-
 
 
 <style>
@@ -196,5 +186,10 @@
 
     .btn-link:hover {
         text-decoration: none;
+    }
+
+    .category-filter.active, .type-filter.active {
+        background-color: rgba(0, 123, 255, 0.1); /* светло-синий фон для активного состояния */
+        border-left: 3px solid #007bff; /* синяя линия слева для активного состояния */
     }
 </style>

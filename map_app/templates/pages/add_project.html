@@ -3,203 +3,585 @@
 {% block title %}ВЗИК | Добавить проект{% endblock %}
 
 {% block content %}
-<main class="content">
-    <div class="container-fluid p-0">
-        <div class="mb-3">
-            <h1 class="h3 d-inline align-middle">Добавить проект</h1>
-        </div>
-        <div class="row">
-            <!-- Основная информация -->
-            <div class="col-12 col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Основная информация</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="form-label" for="id_title">Название</label>
-                                {{ form.title }}
-                                <div class="text-danger">{{ form.title.errors }}</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="id_description">Описание</label>
-                                {{ form.description }}
-                                <div class="text-danger">{{ form.description.errors }}</div>
-                            </div>
-                            <input type="hidden" name="latitude" value="{{ request.GET.lat }}">
-                            <input type="hidden" name="longitude" value="{{ request.GET.lng }}">
-                    </div>
-                </div>
+    <main class="content">
+        <div class="container-fluid p-0">
+            <div class="mb-3">
+                <h1 class="h3 d-inline align-middle">Добавить проект</h1>
             </div>
-            <!-- Категория объекта -->
-            <div class="col-12 col-lg-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Категория объекта</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="category-container">
-                            <div class="mb-3 category-entry">
+            <div class="row">
+                <!-- Основная информация -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Основная информация</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_title">Название</label>
+                                    {{ form.title }}
+                                    <div class="text-danger">{{ form.title.errors }}</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_description">Описание</label>
+                                    {{ form.description }}
+                                    <div class="text-danger">{{ form.description.errors }}</div>
+                                </div>
+                                <input type="hidden" name="latitude" value="{{ request.GET.lat }}">
+                                <input type="hidden" name="longitude" value="{{ request.GET.lng }}">
                                 <div class="d-flex">
                                     <div class="me-2 flex-fill">
-                                        <label class="form-label" for="id_category">Категория</label>
-                                        {{ form.category }}
-                                        <div class="text-danger">{{ form.category.errors }}</div>
+                                        <label class="form-label" for="id_country">Страна</label>
+                                        <input type="text" name="country" id="id_country" class="form-control">
                                     </div>
                                     <div class="flex-fill">
-                                        <label class="form-label" for="id_main_type">Основной тип</label>
-                                        {{ form.main_type }}
-                                        <div class="text-danger">{{ form.main_type.errors }}</div>
+                                        <label class="form-label" for="id_city">Город</label>
+                                        <input type="text" name="city" id="id_city" class="form-control">
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Категория объекта -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Категория объекта</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="category-container">
+                                <div class="mb-3 category-entry">
+                                    <div class="d-flex">
+                                        <div class="me-2 flex-fill">
+                                            <label class="form-label" for="id_category">Категория</label>
+                                            {{ form.category }}
+                                            <div class="text-danger">{{ form.category.errors }}</div>
+                                        </div>
+                                        <div class="flex-fill">
+                                            <label class="form-label" for="id_main_type">Основной тип</label>
+                                            {{ form.main_type }}
+                                            <div class="text-danger">{{ form.main_type.errors }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="add-category-type" class="btn btn-secondary">Добавить категорию и
+                                тип
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Фотографии, видео, ссылки -->
+                <div class="col-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Фотографии, видео, ссылки</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ photo_formset.management_form }}
+                            {{ video_formset.management_form }}
+                            {{ link_formset.management_form }}
+
+                            <!-- Фотографии -->
+                            <div class="mb-3">
+                                <label class="form-label">Фотографии</label>
+                                <div class="upload-container">
+                                    {% for form in photo_formset %}
+                                        <div class="upload-box">
+                                            {{ form.image }}
+                                            <span class="remove">X</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <hr class="my-0"/>
+                            <!-- Видео -->
+                            <div class="mb-3">
+                                <label class="form-label">Видео</label>
+                                <div id="video-container">
+                                    {% for form in video_formset %}
+                                        <div class="video-entry d-flex">
+                                            <input type="url" name="{{ form.prefix }}-video" class="form-control"
+                                                   placeholder="Введите ссылку на видео"
+                                                   value="{{ form.initial.video }}">
+                                            <input type="text" name="{{ form.prefix }}-description" class="form-control"
+                                                   placeholder="Введите описание видео"
+                                                   value="{{ form.initial.description }}">
+                                            <div class="text-danger">{{ form.video.errors }}</div>
+                                            <div class="text-danger">{{ form.description.errors }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button type="button" id="add-video" class="btn btn-secondary mt-2">Добавить видео
+                                </button>
+                            </div>
+                            <hr class="my-0"/>
+                            <!-- Ссылки -->
+                            <div class="mb-3">
+                                <label class="form-label">Ссылки на дополнительные материалы</label>
+                                <div id="link-container">
+                                    {% for form in link_formset %}
+                                        <div class="link-entry d-flex">
+                                            <input type="url" name="{{ form.prefix }}-url" class="form-control"
+                                                   placeholder="Введите ссылку" value="{{ form.initial.url }}">
+                                            <input type="text" name="{{ form.prefix }}-description" class="form-control"
+                                                   placeholder="Введите описание ссылки"
+                                                   value="{{ form.initial.description }}">
+                                            <div class="text-danger">{{ form.url.errors }}</div>
+                                            <div class="text-danger">{{ form.description.errors }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <button type="button" id="add-link" class="btn btn-secondary mt-2">Добавить ссылку
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Дополнительные данные об объекте -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Дополнительные данные об объекте</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="id_creation_year">Год создания</label>
+                                <input type="text" name="creation_year" id="id_creation_year" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_design_year">Год проектирования</label>
+                                <input type="text" name="design_year" id="id_design_year" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_project_author">Автор проекта</label>
+                                <input type="text" name="project_author" id="id_project_author" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_project_description">Описание проекта</label>
+                                <textarea name="project_description" id="id_project_description"
+                                          class="form-control"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_additional_info">Дополнительная информация</label>
+                                <input type="text" name="additional_info" id="id_additional_info" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Мониторинг -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Мониторинг</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Ведется ли мониторинг</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_monitoring"
+                                           id="id_is_monitoring">
+                                    <label class="form-check-label" for="id_is_monitoring">Да</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_monitoring_parameters">Какие параметры
+                                    измеряются?</label>
+                                <input type="text" name="monitoring_parameters" id="id_monitoring_parameters"
+                                       class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_monitoring_start_year">С какого года работает
+                                    система?</label>
+                                <input type="text" name="monitoring_start_year" id="id_monitoring_start_year"
+                                       class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_monitoring_equipment">Какое оборудование
+                                    используется?</label>
+                                <input type="text" name="monitoring_equipment" id="id_monitoring_equipment"
+                                       class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_monitoring_owner">Кто собственник системы
+                                    мониторинга?</label>
+                                <input type="text" name="monitoring_owner" id="id_monitoring_owner"
+                                       class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Открыты ли данные?</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="is_data_open"
+                                           id="id_is_data_open">
+                                    <label class="form-check-label" for="id_is_data_open">Да</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Экосистемные услуги -->
+                <div class="col-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Экосистемные услуги</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Измерялись ли на вашем объекте экосистемные услуги? Если да,
+                                    то какие?</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="is_ecosystem_services_measured" id="id_is_ecosystem_services_measured">
+                                    <label class="form-check-label" for="id_is_ecosystem_services_measured">Да</label>
+                                </div>
+                                <textarea name="ecosystem_services_measured" id="id_ecosystem_services_measured"
+                                          class="form-control"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Какие экосистемные услуги вы бы хотели измерить? Выберете пять
+                                    основных.</label>
+                                <div>
+                                    <div class="ecosystem-category">
+                                        <label class="ecosystem-category-title"><strong>Вода</strong></label>
+                                        <div class="ecosystem-services-list" style="display: none;">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_1"
+                                                       value="1">
+                                                <label class="form-check-label" for="id_ecosystem_service_1">Регулирование
+                                                    подтопления территории за счёт зелёных решений</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_2"
+                                                       value="2">
+                                                <label class="form-check-label" for="id_ecosystem_service_2">Регулирование
+                                                    температуры и влажности воздуха за счёт водных объектов</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_3"
+                                                       value="3">
+                                                <label class="form-check-label" for="id_ecosystem_service_3">Познавательная
+                                                    ценность</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_4"
+                                                       value="4">
+                                                <label class="form-check-label" for="id_ecosystem_service_4">Наблюдение
+                                                    за живой природой</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_5"
+                                                       value="5">
+                                                <label class="form-check-label" for="id_ecosystem_service_5">Чувство
+                                                    места</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_6"
+                                                       value="6">
+                                                <label class="form-check-label"
+                                                       for="id_ecosystem_service_6">Рекреация</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_7"
+                                                       value="7">
+                                                <label class="form-check-label" for="id_ecosystem_service_7">Повышение
+                                                    привлекательности территории за счёт наличия водных объектов
+                                                    (стоимость недвижимости)</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_8"
+                                                       value="8">
+                                                <label class="form-check-label" for="id_ecosystem_service_8">Устойчивость
+                                                    береговой линии</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_9"
+                                                       value="9">
+                                                <label class="form-check-label" for="id_ecosystem_service_9">Очищение
+                                                    воды растениями (биофильтрация)</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ecosystem-category">
+                                        <label class="ecosystem-category-title"><strong>Почва</strong></label>
+                                        <div class="ecosystem-services-list" style="display: none;">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_10"
+                                                       value="10">
+                                                <label class="form-check-label" for="id_ecosystem_service_10">Очистка
+                                                    воды почвой</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_11"
+                                                       value="11">
+                                                <label class="form-check-label" for="id_ecosystem_service_11">Регулирование
+                                                    инфильтрации</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_12"
+                                                       value="12">
+                                                <label class="form-check-label" for="id_ecosystem_service_12">Депонирование
+                                                    (поглощение) углерода почвой</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_13"
+                                                       value="13">
+                                                <label class="form-check-label" for="id_ecosystem_service_13">Очищение
+                                                    почв почвенными микроорганизмами</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecosystem_service_14"
+                                                       value="14">
+                                                <label class="form-check-label" for="id_ecосистем_service_14">Срок жизни
+                                                    почвенных конструкций</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_15"
+                                                       value="15">
+                                                <label class="form-check-label" for="id_ecосистем_service_15">Вероятность
+                                                    химического повреждения почв в ходе эксплуатации</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_16"
+                                                       value="16">
+                                                <label class="form-check-label" for="id_ecосистем_service_16">Контроль
+                                                    эрозии почв</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_17"
+                                                       value="17">
+                                                <label class="form-check-label" for="id_ecосистем_service_17">Контроль
+                                                    дефляции почв</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ecosystem-category">
+                                        <label class="ecosystem-category-title"><strong>Растения</strong></label>
+                                        <div class="ecosystem-services-list" style="display: none;">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_18"
+                                                       value="18">
+                                                <label class="form-check-label" for="id_ecосистем_service_18">Депонирование
+                                                    (накопление) углерода деревьями и кустарниками</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_19"
+                                                       value="19">
+                                                <label class="form-check-label" for="id_ecосистем_service_19">Регулирование
+                                                    комфортности пребывания растениям (температура+влажность)</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_20"
+                                                       value="20">
+                                                <label class="form-check-label" for="id_ecосистем_service_20">Термоизоляция
+                                                    (при помощи кровельного озеленения)</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_21"
+                                                       value="21">
+                                                <label class="form-check-label" for="id_ecосистем_service_21">Уменьшение
+                                                    скорости ветра</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_22"
+                                                       value="22">
+                                                <label class="form-check-label" for="id_ecосистем_service_22">Уменьшение
+                                                    уровня шумового загрязнения</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_23"
+                                                       value="23">
+                                                <label class="form-check-label" for="id_ecосистем_service_23">Осаждение
+                                                    микрочастиц пыли растениями</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_24"
+                                                       value="24">
+                                                <label class="form-check-label" for="id_ecосистем_service_24">Познавательная
+                                                    ценность (число видов растений)</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_25"
+                                                       value="25">
+                                                <label class="form-check-label" for="id_ecосистем_service_25">Наблюдение
+                                                    за живой природой. Чувство места (наличие уникальных природных
+                                                    объектов)</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_26"
+                                                       value="26">
+                                                <label class="form-check-label"
+                                                       for="id_ecосистем_service_26">Рекреация</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_27"
+                                                       value="27">
+                                                <label class="form-check-label" for="id_ecосистем_service_27">Повышение
+                                                    привлекательности территории (стоимость недвижимости)</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_28"
+                                                       value="28">
+                                                <label class="form-check-label" for="id_ecосистем_service_28">Регулирование
+                                                    стока за счёт транспирации растениями</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_29"
+                                                       value="29">
+                                                <label class="form-check-label" for="id_ecосистем_service_29">Очищение
+                                                    почв растениями</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="ecosystem_services_desired" id="id_ecосистем_service_30"
+                                                       value="30">
+                                                <label class="form-check-label" for="id_ecосистем_service_30">Поддержание
+                                                    популяции редких видов растений (и животных)</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button type="button" id="add-category-type" class="btn btn-secondary">Добавить категорию и тип</button>
                     </div>
                 </div>
-            </div>
-            <!-- Фотографии, видео, ссылки -->
-            <div class="col-12 col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Фотографии, видео, ссылки</h5>
-                    </div>
-                    <div class="card-body">
-                        {{ photo_formset.management_form }}
-                        {{ video_formset.management_form }}
-                        {{ link_formset.management_form }}
 
-                        <!-- Фотографии -->
-                        <div class="mb-3">
-                            <label class="form-label">Фотографии</label>
-                            <div class="upload-container">
-                                {% for form in photo_formset %}
-                                    <div class="upload-box">
-                                        {{ form.image }}
-                                        <span class="remove">X</span>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <hr class="my-0" />
-                        <!-- Видео -->
-                        <div class="mb-3">
-                            <label class="form-label">Видео</label>
-                            <div id="video-container">
-                                {% for form in video_formset %}
-                                    <div class="video-entry d-flex">
-                                        <input type="url" name="{{ form.prefix }}-video" class="form-control" placeholder="Введите ссылку на видео" value="{{ form.initial.video }}">
-                                        <input type="text" name="{{ form.prefix }}-description" class="form-control" placeholder="Введите описание видео" value="{{ form.initial.description }}">
-                                        <div class="text-danger">{{ form.video.errors }}</div>
-                                        <div class="text-danger">{{ form.description.errors }}</div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            <button type="button" id="add-video" class="btn btn-secondary mt-2">Добавить видео</button>
-                        </div>
-                        <hr class="my-0" />
-                        <!-- Ссылки -->
-                        <div class="mb-3">
-                            <label class="form-label">Ссылки на дополнительные материалы</label>
-                            <div id="link-container">
-                                {% for form in link_formset %}
-                                    <div class="link-entry d-flex">
-                                        <input type="url" name="{{ form.prefix }}-url" class="form-control" placeholder="Введите ссылку" value="{{ form.initial.url }}">
-                                        <input type="text" name="{{ form.prefix }}-description" class="form-control" placeholder="Введите описание ссылки" value="{{ form.initial.description }}">
-                                        <div class="text-danger">{{ form.url.errors }}</div>
-                                        <div class="text-danger">{{ form.description.errors }}</div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            <button type="button" id="add-link" class="btn btn-secondary mt-2">Добавить ссылку</button>
-                        </div>
 
-                        <div class="d-flex justify-content-between">
+                <!-- Кнопки действия -->
+                <div class="col-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-body d-flex justify-content-between">
                             <button type="submit" class="btn btn-primary">Добавить проект</button>
-                            <button type="button" onclick="history.back()" class="btn btn-lg btn-light w-50">Назад</button>
+                            <button type="button" onclick="history.back()" class="btn btn-lg btn-light w-50">Назад
+                            </button>
                         </div>
-                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
-        photoInputs.forEach(input => {
-            input.addEventListener('change', function () {
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.previousElementSibling && this.previousElementSibling.remove();
-                        this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
-        });
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const latitude = document.querySelector('input[name="latitude"]').value;
+            const longitude = document.querySelector('input[name="longitude"]').value;
+            const countryField = document.getElementById('id_country');
+            const cityField = document.getElementById('id_city');
 
-        document.querySelectorAll('.upload-box .remove').forEach(remove => {
-            remove.addEventListener('click', function () {
-                const box = this.parentElement;
-                box.querySelector('img') && box.querySelector('img').remove();
-                box.querySelector('input').value = '';
-            });
-        });
-
-        const categoryField = document.getElementById('id_category');
-        const mainTypeField = document.getElementById('id_main_type');
-        const additionalCategoryField = document.getElementById('id_additional_category');
-        const additionalTypeField = document.getElementById('id_additional_type');
-        const additionalTypesContainer = document.getElementById('additional-types-container');
-        const addAdditionalTypeButton = document.getElementById('add-additional-type');
-        const categoryContainer = document.getElementById('category-container');
-        const addCategoryTypeButton = document.getElementById('add-category-type');
-        const videoContainer = document.getElementById('video-container');
-        const addVideoButton = document.getElementById('add-video');
-        const linkContainer = document.getElementById('link-container');
-        const addLinkButton = document.getElementById('add-link');
-
-        function fetchTypesByCategory(categoryId, targetField) {
-            if (categoryId) {
-                fetch(`/get_types_by_category/${categoryId}/`)
+            if (latitude && longitude) {
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
                     .then(response => response.json())
                     .then(data => {
-                        let options = '<option value="">---------</option>';
-                        data.types.forEach(type => {
-                            options += `<option value="${type.id}">${type.name}</option>`;
-                        });
-                        targetField.innerHTML = options;
-                    });
-            } else {
-                targetField.innerHTML = '<option value="">---------</option>';
+                        if (data.address) {
+                            countryField.value = data.address.country || '';
+                            cityField.value = data.address.city || data.address.town || data.address.village || '';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
             }
-        }
 
-        if (categoryField) {
-            categoryField.addEventListener('change', function () {
-                fetchTypesByCategory(this.value, mainTypeField);
-            });
-        }
+            // Остальной код для загрузки фото и видео
 
-        if (additionalCategoryField) {
-            additionalCategoryField.addEventListener('change', function () {
-                fetchTypesByCategory(this.value, additionalTypeField);
+            const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
+            photoInputs.forEach(input => {
+                input.addEventListener('change', function () {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.previousElementSibling && this.previousElementSibling.remove();
+                            this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
             });
-        }
 
-        if (addAdditionalTypeButton) {
-            addAdditionalTypeButton.addEventListener('click', function () {
-                additionalTypesContainer.style.display = additionalTypesContainer.style.display === 'none' ? 'block' : 'none';
+            document.querySelectorAll('.upload-box .remove').forEach(remove => {
+                remove.addEventListener('click', function () {
+                    const box = this.parentElement;
+                    box.querySelector('img') && box.querySelector('img').remove();
+                    box.querySelector('input').value = '';
+                });
             });
-        }
+
+            const categoryField = document.getElementById('id_category');
+            const mainTypeField = document.getElementById('id_main_type');
+            const additionalCategoryField = document.getElementById('id_additional_category');
+            const additionalTypeField = document.getElementById('id_additional_type');
+            const additionalTypesContainer = document.getElementById('additional-types-container');
+            const addAdditionalTypeButton = document.getElementById('add-additional-type');
+            const categoryContainer = document.getElementById('category-container');
+            const addCategoryTypeButton = document.getElementById('add-category-type');
+            const videoContainer = document.getElementById('video-container');
+            const addVideoButton = document.getElementById('add-video');
+            const linkContainer = document.getElementById('link-container');
+            const addLinkButton = document.getElementById('add-link');
+
+            function fetchTypesByCategory(categoryId, targetField) {
+                if (categoryId) {
+                    fetch(`/get_types_by_category/${categoryId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            let options = '<option value="">---------</option>';
+                            data.types.forEach(type => {
+                                options += `<option value="${type.id}">${type.name}</option>`;
+                            });
+                            targetField.innerHTML = options;
+                        });
+                } else {
+                    targetField.innerHTML = '<option value="">---------</option>';
+                }
+            }
+
+            if (categoryField) {
+                categoryField.addEventListener('change', function () {
+                    fetchTypesByCategory(this.value, mainTypeField);
+                });
+            }
+
+            if (additionalCategoryField) {
+                additionalCategoryField.addEventListener('change', function () {
+                    fetchTypesByCategory(this.value, additionalTypeField);
+                });
+            }
+
+            if (addAdditionalTypeButton) {
+                addAdditionalTypeButton.addEventListener('click', function () {
+                    additionalTypesContainer.style.display = additionalTypesContainer.style.display === 'none' ? 'block' : 'none';
+                });
+            }
 
         if (addCategoryTypeButton) {
             let categoryIndex = 0;
@@ -225,60 +607,93 @@
             });
         }
 
-        addVideoButton.addEventListener('click', function () {
-            const newVideoEntry = document.createElement('div');
-            newVideoEntry.classList.add('video-entry', 'd-flex');
-            newVideoEntry.innerHTML = `
+            addVideoButton.addEventListener('click', function () {
+                const newVideoEntry = document.createElement('div');
+                newVideoEntry.classList.add('video-entry', 'd-flex');
+                newVideoEntry.innerHTML = `
                 <input type="url" name="video-${videoContainer.children.length}-video" placeholder="Ссылка на видео" class="form-control me-2" />
                 <input type="text" name="video-${videoContainer.children.length}-description" placeholder="Описание" class="form-control me-2" />
             `;
-            videoContainer.appendChild(newVideoEntry);
-        });
+                videoContainer.appendChild(newVideoEntry);
+            });
 
-        addLinkButton.addEventListener('click', function () {
-            const newLinkEntry = document.createElement('div');
-            newLinkEntry.classList.add('link-entry', 'd-flex');
-            newLinkEntry.innerHTML = `
+            addLinkButton.addEventListener('click', function () {
+                const newLinkEntry = document.createElement('div');
+                newLinkEntry.classList.add('link-entry', 'd-flex');
+                newLinkEntry.innerHTML = `
                 <input type="url" name="link-${linkContainer.children.length}-url" placeholder="Ссылка" class="form-control me-2" />
                 <input type="text" name="link-${linkContainer.children.length}-description" placeholder="Описание" class="form-control me-2" />
             `;
-            linkContainer.appendChild(newLinkEntry);
+                linkContainer.appendChild(newLinkEntry);
+            });
+
+            // Ограничение выбора до 5 галочек
+            const maxChecks = 5;
+            const checkboxes = document.querySelectorAll('input[name="ecosystem_services_desired"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const checkedCount = document.querySelectorAll('input[name="ecosystem_services_desired"]:checked').length;
+                    if (checkedCount > maxChecks) {
+                        this.checked = false;
+                    }
+                });
+            });
+
+            // Разворачивание и сворачивание категорий
+            const categoryTitles = document.querySelectorAll('.ecosystem-category-title');
+            categoryTitles.forEach(title => {
+                title.addEventListener('click', function () {
+                    const servicesList = this.nextElementSibling;
+                    if (servicesList.style.display === 'none') {
+                        servicesList.style.display = 'block';
+                    } else {
+                        servicesList.style.display = 'none';
+                    }
+                });
+            });
         });
-    });
-</script>
-<style>
-    .upload-container {
-        display: flex;
-        flex-wrap: wrap;
-    }
-    .upload-box {
-        width: 120px;
-        height: 120px;
-        border: 2px solid #000;
-        margin: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-    .upload-box img {
-        max-width: 100%;
-        max-height: 100%;
-    }
-    .upload-box input {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-    }
-    .upload-box .remove {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background: #fff;
-        border-radius: 50%;
-        cursor: pointer;
-    }
-</style>
+    </script>
+    <style>
+        .upload-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .upload-box {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #000;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .upload-box img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .upload-box input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-box .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .ecosystem-category-title {
+            cursor: pointer;
+        }
+    </style>
 {% endblock %}

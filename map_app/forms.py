@@ -5,10 +5,25 @@ class ProjectForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), required=True, label="Категория")
     main_type = forms.ModelChoiceField(queryset=Type.objects.none(), required=True, label="Основной тип")
     additional_types = forms.ModelMultipleChoiceField(queryset=Type.objects.none(), required=False, label="Дополнительные типы")
+    is_monitoring = forms.BooleanField(required=False, label="Ведется ли мониторинг")
+    is_data_open = forms.BooleanField(required=False, label="Открыты ли данные?")
+    is_ecosystem_services_measured = forms.BooleanField(required=False, label="Измерялись ли экосистемные услуги")
+    ecosystem_services_desired = forms.MultipleChoiceField(
+        choices=[(str(i), f"Услуга {i}") for i in range(1, 31)],  # Подставьте реальные идентификаторы и названия услуг
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="Экосистемные услуги"
+    )
 
     class Meta:
         model = Project
-        fields = ['title', 'description', 'latitude', 'longitude', 'category', 'main_type', 'additional_types']
+        fields = [
+            'title', 'description', 'latitude', 'longitude', 'category', 'main_type', 'additional_types',
+            'country', 'city', 'creation_year', 'design_year', 'project_author', 'project_description',
+            'additional_info', 'is_monitoring', 'monitoring_parameters', 'monitoring_start_year',
+            'monitoring_equipment', 'monitoring_owner', 'is_data_open', 'is_ecosystem_services_measured',
+            'ecosystem_services_measured', 'ecosystem_services_desired'
+        ]
 
     def __init__(self, *args, **kwargs):
         super(ProjectForm, self).__init__(*args, **kwargs)
