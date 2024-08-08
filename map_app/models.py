@@ -1,6 +1,7 @@
 import os
 from django.conf import settings
 from django.db import models
+from ckeditor.fields import RichTextField
 
 
 class Category(models.Model):
@@ -49,6 +50,7 @@ class Project(models.Model):
     is_ecosystem_services_measured = models.BooleanField(default=False)
     ecosystem_services_measured = models.TextField(blank=True, null=True)
     ecosystem_services_desired = models.JSONField(blank=True, null=True, default=list)
+
     def __str__(self):
         return self.title
 
@@ -81,3 +83,11 @@ class Link(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class AboutPage(models.Model):
+    title = models.CharField(max_length=255, default="О проекте")
+    content = RichTextField()
+
+    def __str__(self):
+        return self.title

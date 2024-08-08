@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ about_page.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h1>{{ about_page.title }}</h1>
+        </div>
+        <div class="card-body">
+            {{ about_page.content|safe }}
+        </div>
+    </div>
+</div>
+{% endblock %}

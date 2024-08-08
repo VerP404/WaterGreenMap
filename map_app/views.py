@@ -5,11 +5,11 @@ import os
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from WaterGreenMap import settings
 from map_app.forms import ProjectForm, PhotoFormSet, VideoFormSet, LinkFormSet
-from map_app.models import Type, Link, Video, Photo, Project, Category
+from map_app.models import Type, Link, Video, Photo, Project, Category, AboutPage
 from django.contrib import messages
 
 
@@ -30,7 +30,7 @@ def map(request):
 
     projects_data = json.dumps(
         list(filtered_projects.values(
-            'title', 'description', 'latitude', 'longitude',
+            'id', 'title', 'description', 'latitude', 'longitude',
             'main_type__color', 'main_type__category__color'
         )),
         cls=DjangoJSONEncoder
@@ -41,6 +41,7 @@ def map(request):
         'categories': categories,
         'types': types
     })
+
 
 def update_map(request):
     category_ids = request.GET.get('categories', '').split(',')
@@ -98,13 +99,14 @@ def add_project(request):
 
             project.save()
 
-            # Save the additional types excluding the main type
+            # Сохранение дополнительных типов, исключая основной тип
             additional_types = form.cleaned_data['additional_types']
             main_type = form.cleaned_data['main_type']
             additional_types = additional_types.exclude(id=main_type.id)
             project.additional_types.set(additional_types)
 
             photo_formset.instance = project
+            photo_formset.save()
 
             video_formset.instance = project
             video_formset.save()
@@ -165,3 +167,17 @@ def get_types_by_categories(request):
     types = Type.objects.filter(category_id__in=category_ids)
     types_list = [{'id': type.id, 'name': type.name} for type in types]
     return JsonResponse({'types': types_list})
+
+
+def project_detail_view(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    user_projects_count = Project.objects.filter(user=project.user, is_published=True).count()
+    return render(request, 'pages/project_detail.html', {
+        'project': project,
+        'user_projects_count': user_projects_count
+    })
+
+
+def about_view(request):
+    about_page = AboutPage.objects.first()
+    return render(request, 'pages/about.html', {'about_page': about_page})

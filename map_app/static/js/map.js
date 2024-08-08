@@ -41,18 +41,22 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmPointBtn.style.display = 'block';
     }
 
-    addProjectButton.addEventListener('click', function () {
-        mapOverlay.style.display = 'block';
-        map.getContainer().style.cursor = 'crosshair';
-        map.on('click', onMapClick);
-    });
+    if (addProjectButton) {
+        addProjectButton.addEventListener('click', function () {
+            mapOverlay.style.display = 'block';
+            map.getContainer().style.cursor = 'crosshair';
+            map.on('click', onMapClick);
+        });
+    }
 
-    confirmPointBtn.addEventListener('click', function () {
-        if (selectedPoint) {
-            var latlng = selectedPoint.getLatLng();
-            window.location.href = `/add_project/?lat=${latlng.lat}&lng=${latlng.lng}`;
-        }
-    });
+    if (confirmPointBtn) {
+        confirmPointBtn.addEventListener('click', function () {
+            if (selectedPoint) {
+                var latlng = selectedPoint.getLatLng();
+                window.location.href = `/add_project/?lat=${latlng.lat}&lng=${latlng.lng}`;
+            }
+        });
+    }
 
     function createDropIcon(fillColor, strokeColor) {
         return L.divIcon({
@@ -76,16 +80,31 @@ document.addEventListener('DOMContentLoaded', function () {
             var marker = L.marker([project.latitude, project.longitude], {
                 icon: createDropIcon(fillColor, strokeColor)
             });
-            marker.bindPopup(`<b>${project.title}</b><br>${project.description}`);
+            var popupContent = `
+                <div>
+                    <h3>${project.title}</h3>
+                    <p>${project.description}</p>
+                    <a href="/project/${project.id}">Открыть объект</a>
+                </div>`;
+            marker.bindPopup(popupContent);
             markers.addLayer(marker);
         });
     }
 
-    loadMarkers(projects);
+    try {
+        loadMarkers(projects);
+    } catch (error) {
+        console.error("Error loading markers:", error);
+    }
+
     map.addLayer(markers);
 
-    window.updateMarkers = function(data) {
+    window.updateMarkers = function (data) {
         markers.clearLayers();
-        loadMarkers(data);
+        try {
+            loadMarkers(data);
+        } catch (error) {
+            console.error("Error updating markers:", error);
+        }
     };
 });

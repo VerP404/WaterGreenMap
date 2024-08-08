@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from django.utils import timezone
 
 class ActivityArea(models.Model):
     name = models.CharField(max_length=100)
@@ -43,6 +43,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    registration_date = models.DateTimeField(default=timezone.now)
+    auto_publish = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 

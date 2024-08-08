@@ -493,95 +493,75 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const latitude = document.querySelector('input[name="latitude"]').value;
-            const longitude = document.querySelector('input[name="longitude"]').value;
-            const countryField = document.getElementById('id_country');
-            const cityField = document.getElementById('id_city');
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const latitude = document.querySelector('input[name="latitude"]').value;
+        const longitude = document.querySelector('input[name="longitude"]').value;
+        const countryField = document.getElementById('id_country');
+        const cityField = document.getElementById('id_city');
 
-            if (latitude && longitude) {
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
+        if (latitude && longitude) {
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.address) {
+                        countryField.value = data.address.country || '';
+                        cityField.value = data.address.city || data.address.town || data.address.village || '';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Остальной код для загрузки фото и видео
+
+        const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
+        photoInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.previousElementSibling && this.previousElementSibling.remove();
+                        this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+
+        document.querySelectorAll('.upload-box .remove').forEach(remove => {
+            remove.addEventListener('click', function () {
+                const box = this.parentElement;
+                box.querySelector('img') && box.querySelector('img').remove();
+                box.querySelector('input').value = '';
+            });
+        });
+
+        const categoryField = document.getElementById('id_category');
+        const mainTypeField = document.getElementById('id_main_type');
+        const categoryContainer = document.getElementById('category-container');
+        const addCategoryTypeButton = document.getElementById('add-category-type');
+
+        function fetchTypesByCategory(categoryId, targetField) {
+            if (categoryId) {
+                fetch(`/get_types_by_category/${categoryId}/`)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.address) {
-                            countryField.value = data.address.country || '';
-                            cityField.value = data.address.city || data.address.town || data.address.village || '';
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-
-            // Остальной код для загрузки фото и видео
-
-            const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
-            photoInputs.forEach(input => {
-                input.addEventListener('change', function () {
-                    if (this.files && this.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            this.previousElementSibling && this.previousElementSibling.remove();
-                            this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
-                        };
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
-            });
-
-            document.querySelectorAll('.upload-box .remove').forEach(remove => {
-                remove.addEventListener('click', function () {
-                    const box = this.parentElement;
-                    box.querySelector('img') && box.querySelector('img').remove();
-                    box.querySelector('input').value = '';
-                });
-            });
-
-            const categoryField = document.getElementById('id_category');
-            const mainTypeField = document.getElementById('id_main_type');
-            const additionalCategoryField = document.getElementById('id_additional_category');
-            const additionalTypeField = document.getElementById('id_additional_type');
-            const additionalTypesContainer = document.getElementById('additional-types-container');
-            const addAdditionalTypeButton = document.getElementById('add-additional-type');
-            const categoryContainer = document.getElementById('category-container');
-            const addCategoryTypeButton = document.getElementById('add-category-type');
-            const videoContainer = document.getElementById('video-container');
-            const addVideoButton = document.getElementById('add-video');
-            const linkContainer = document.getElementById('link-container');
-            const addLinkButton = document.getElementById('add-link');
-
-            function fetchTypesByCategory(categoryId, targetField) {
-                if (categoryId) {
-                    fetch(`/get_types_by_category/${categoryId}/`)
-                        .then(response => response.json())
-                        .then(data => {
-                            let options = '<option value="">---------</option>';
-                            data.types.forEach(type => {
-                                options += `<option value="${type.id}">${type.name}</option>`;
-                            });
-                            targetField.innerHTML = options;
+                        let options = '<option value="">---------</option>';
+                        data.types.forEach(type => {
+                            options += `<option value="${type.id}">${type.name}</option>`;
                         });
-                } else {
-                    targetField.innerHTML = '<option value="">---------</option>';
-                }
+                        targetField.innerHTML = options;
+                    });
+            } else {
+                targetField.innerHTML = '<option value="">---------</option>';
             }
+        }
 
-            if (categoryField) {
-                categoryField.addEventListener('change', function () {
-                    fetchTypesByCategory(this.value, mainTypeField);
-                });
-            }
-
-            if (additionalCategoryField) {
-                additionalCategoryField.addEventListener('change', function () {
-                    fetchTypesByCategory(this.value, additionalTypeField);
-                });
-            }
-
-            if (addAdditionalTypeButton) {
-                addAdditionalTypeButton.addEventListener('click', function () {
-                    additionalTypesContainer.style.display = additionalTypesContainer.style.display === 'none' ? 'block' : 'none';
-                });
-            }
+        if (categoryField) {
+            categoryField.addEventListener('change', function () {
+                fetchTypesByCategory(this.value, mainTypeField);
+            });
+        }
 
         if (addCategoryTypeButton) {
             let categoryIndex = 0;
@@ -591,68 +571,32 @@
                 newCategoryEntry.innerHTML = `
                     <div class="me-2 flex-fill">
                         <label class="form-label" for="id_additional_category_${categoryIndex}">Категория</label>
-                        <select name="additional_category_${categoryIndex}" id="id_additional_category_${categoryIndex}" class="form-select">
+                        <select name="additional_categories" id="id_additional_category_${categoryIndex}" class="form-select">
                             ${categoryField.innerHTML}
                         </select>
                     </div>
                     <div class="flex-fill">
                         <label class="form-label" for="id_additional_type_${categoryIndex}">Тип</label>
-                        <select name="additional_type_${categoryIndex}" id="id_additional_type_${categoryIndex}" class="form-select">
+                        <select name="additional_types" id="id_additional_type_${categoryIndex}" class="form-select">
                             ${mainTypeField.innerHTML}
                         </select>
                     </div>
                 `;
                 categoryContainer.appendChild(newCategoryEntry);
+
+                const additionalCategoryField = document.getElementById(`id_additional_category_${categoryIndex}`);
+                const additionalTypeField = document.getElementById(`id_additional_type_${categoryIndex}`);
+
+                additionalCategoryField.addEventListener('change', function () {
+                    fetchTypesByCategory(this.value, additionalTypeField);
+                });
+
                 categoryIndex++;
             });
         }
+    });
+</script>
 
-            addVideoButton.addEventListener('click', function () {
-                const newVideoEntry = document.createElement('div');
-                newVideoEntry.classList.add('video-entry', 'd-flex');
-                newVideoEntry.innerHTML = `
-                <input type="url" name="video-${videoContainer.children.length}-video" placeholder="Ссылка на видео" class="form-control me-2" />
-                <input type="text" name="video-${videoContainer.children.length}-description" placeholder="Описание" class="form-control me-2" />
-            `;
-                videoContainer.appendChild(newVideoEntry);
-            });
-
-            addLinkButton.addEventListener('click', function () {
-                const newLinkEntry = document.createElement('div');
-                newLinkEntry.classList.add('link-entry', 'd-flex');
-                newLinkEntry.innerHTML = `
-                <input type="url" name="link-${linkContainer.children.length}-url" placeholder="Ссылка" class="form-control me-2" />
-                <input type="text" name="link-${linkContainer.children.length}-description" placeholder="Описание" class="form-control me-2" />
-            `;
-                linkContainer.appendChild(newLinkEntry);
-            });
-
-            // Ограничение выбора до 5 галочек
-            const maxChecks = 5;
-            const checkboxes = document.querySelectorAll('input[name="ecosystem_services_desired"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    const checkedCount = document.querySelectorAll('input[name="ecosystem_services_desired"]:checked').length;
-                    if (checkedCount > maxChecks) {
-                        this.checked = false;
-                    }
-                });
-            });
-
-            // Разворачивание и сворачивание категорий
-            const categoryTitles = document.querySelectorAll('.ecosystem-category-title');
-            categoryTitles.forEach(title => {
-                title.addEventListener('click', function () {
-                    const servicesList = this.nextElementSibling;
-                    if (servicesList.style.display === 'none') {
-                        servicesList.style.display = 'block';
-                    } else {
-                        servicesList.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
     <style>
         .upload-container {
             display: flex;
