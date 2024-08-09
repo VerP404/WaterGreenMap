@@ -32,13 +32,16 @@ document.addEventListener('DOMContentLoaded', function () {
     var addProjectButton = document.getElementById('add-project-button');
     var mapOverlay = document.getElementById('map-overlay');
     var confirmPointBtn = document.getElementById('confirm-point-btn');
+    var cancelSelectionBtn = document.getElementById('cancel-selection-btn');
+    var buttonContainer = document.querySelector('.button-container');
 
     function onMapClick(e) {
         if (selectedPoint) {
             map.removeLayer(selectedPoint);
         }
         selectedPoint = L.marker(e.latlng).addTo(map);
-        confirmPointBtn.style.display = 'block';
+        buttonContainer.style.display = 'flex'; // Показываем кнопки
+        addProjectButton.style.display = 'none'; // Скрываем кнопку "Добавить объект"
     }
 
     if (addProjectButton) {
@@ -58,6 +61,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    if (cancelSelectionBtn) {
+        cancelSelectionBtn.addEventListener('click', function () {
+            if (selectedPoint) {
+                map.removeLayer(selectedPoint);
+                selectedPoint = null;
+            }
+            buttonContainer.style.display = 'none'; // Скрываем кнопки
+            addProjectButton.style.display = 'block'; // Показываем кнопку "Добавить объект"
+            map.getContainer().style.cursor = '';
+            map.off('click', onMapClick);
+            mapOverlay.style.display = 'none';
+        });
+    }
+
+    // Функция для создания иконок маркеров
     function createDropIcon(fillColor, strokeColor) {
         return L.divIcon({
             html: `
@@ -71,8 +89,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Группа для кластеризации маркеров
     var markers = L.markerClusterGroup();
 
+    // Функция для загрузки маркеров на карту
     function loadMarkers(projects) {
         projects.forEach(function (project) {
             var fillColor = project.main_type__color;
@@ -91,20 +111,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Попытка загрузки маркеров
     try {
         loadMarkers(projects);
     } catch (error) {
-        console.error("Error loading markers:", error);
+        console.error("Ошибка при загрузке маркеров:", error);
     }
 
+    // Добавление маркеров на карту
     map.addLayer(markers);
 
+    // Функция обновления маркеров
     window.updateMarkers = function (data) {
         markers.clearLayers();
         try {
             loadMarkers(data);
         } catch (error) {
-            console.error("Error updating markers:", error);
+            console.error("Ошибка при обновлении маркеров:", error);
         }
     };
 });

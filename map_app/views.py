@@ -71,8 +71,32 @@ def profile_view(request):
 
 
 def project_list_view(request):
+    category_id = request.GET.get('categories', '')
+    type_id = request.GET.get('types', '')
+
     projects = Project.objects.filter(is_published=True).select_related('main_type', 'user').prefetch_related('photos')
-    return render(request, 'pages/project_list.html', {'projects': projects})
+
+    if category_id:
+        projects = projects.filter(main_type__category_id=category_id)
+
+    if type_id:
+        projects = projects.filter(main_type_id=type_id)
+
+    # Сортировка по новизне
+    projects = projects.order_by('-created_at')
+
+    categories = Category.objects.all()
+
+    context = {
+        'projects': projects,
+        'categories': categories,
+        'selected_category': Category.objects.get(id=category_id) if category_id else None,
+        'selected_type': Type.objects.get(id=type_id) if type_id else None,
+        'selected_category_id': category_id,
+        'selected_type_id': type_id,
+    }
+
+    return render(request, 'pages/project_list.html', context)
 
 
 # Настройка логгера

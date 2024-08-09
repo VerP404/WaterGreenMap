@@ -35,8 +35,24 @@
                 <div class="header-content">
                     <h1>{{ project.title }}</h1>
                     <div class="tags">
-                        <span style="background: {{ project.main_type.color }}; color: #fff;">{{ project.main_type.name }}</span>
-                        <span style="background: {{ project.main_type.category.color }}; color: #fff;">{{ project.main_type.category.name }}</span>
+                        <!-- Ссылка на отфильтрованные проекты по категории -->
+                        <a href="{% url 'project_list' %}?categories={{ project.main_type.category.id }}"
+                           style="background: {{ project.main_type.category.color }}; color: #fff;" class="tag-link">
+                            {{ project.main_type.category.name }}
+                        </a>
+                        <!-- Основной тип -->
+                        <a href="{% url 'project_list' %}?types={{ project.main_type.id }}"
+                           style="background: {{ project.main_type.color }}; color: #fff;" class="tag-link">
+                            {{ project.main_type.name }}
+                        </a>
+
+                        <!-- Дополнительные типы -->
+                        {% for additional_type in project.additional_types.all %}
+                            <a href="{% url 'project_list' %}?types={{ additional_type.id }}"
+                               style="background: {{ additional_type.color }}; color: #fff;" class="tag-link">
+                                {{ additional_type.name }}
+                            </a>
+                        {% endfor %}
                     </div>
                     <p class="created-by">Дата публикации: {{ project.created_at|date:"d-m-Y" }}</p>
                 </div>
@@ -46,7 +62,8 @@
                               data-feather="user"></i> {{ project.user.first_name }} {{ project.user.last_name }}</p>
                         <p><i class="align-middle" data-feather="calendar"></i> Участник проекта
                             с {{ project.user.registration_date|date:"d-m-Y" }}</p>
-                        <p><i class="align-middle" data-feather="folder"></i> Опубликовано проектов: {{ user_projects_count }}</p>
+                        <p><i class="align-middle" data-feather="folder"></i> Опубликовано
+                            проектов: {{ user_projects_count }}</p>
                     </div>
                 </div>
             </div>
@@ -66,18 +83,25 @@
                         <a href="{{ link.url }}" target="_blank">{{ link.description }}</a>
                     </div>
                 {% endfor %}
+                {% for video in project.videos.all %}
+                    <div>
+                        <a href="{{ video.video }}" class="video-link"
+                           data-description="{{ video.description }}">{{ video.description }}</a>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+    <!-- Модальное окно для YouTube-видео -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <iframe id="youtubeVideo" width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
 
+    <style>
         .card {
             width: 100%;
             max-width: 1100px;
@@ -194,10 +218,16 @@
             transform: translateY(-50%);
             font-size: 2em;
             color: white;
-            padding: 10px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
             user-select: none;
-            transition: background 0.2s ease;
+            transition: background 0.2s ease, border 0.2s ease;
+            border-radius: 50%; /* Делаем круг */
+            background-color: rgba(0, 0, 0, 0.15); /* Фон кнопки */
         }
 
         .prev {
@@ -210,6 +240,7 @@
 
         .arrow:hover {
             background: rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.8); /* Меняем цвет обводки при наведении */
         }
 
         .indicators {
@@ -239,6 +270,45 @@
             font-style: italic;
             margin: 0;
             padding-top: 5px;
+        }
+
+        /* Стиль для модального окна */
+        .modal {
+            display: none; /* Скрыто по умолчанию */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Стиль для содержимого модального окна */
+        .modal-content {
+            margin: 15% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        /* Стиль для кнопки закрытия модального окна */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
 
         @media (max-width: 1100px) {
@@ -297,6 +367,47 @@
             window.goToSlide = function (n) {
                 showSlides(slideIndex = n + 1);
             }
+
+            const modal = document.getElementById('videoModal');
+            const iframe = document.getElementById('youtubeVideo');
+            const closeBtn = document.querySelector('.close');
+            const modalContent = document.querySelector('.modal-content');
+
+            document.querySelectorAll('.video-link').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const videoUrl = this.getAttribute('href');
+                    const embedUrl = videoUrl.replace('watch?v=', 'embed/');
+                    const videoDescription = this.getAttribute('data-description');
+
+                    iframe.src = embedUrl;
+                    modal.style.display = 'block';
+
+                    // Создаем и добавляем описание под видео, если его еще нет
+                    let descriptionElement = document.getElementById('videoDescription');
+                    if (!descriptionElement) {
+                        descriptionElement = document.createElement('p');
+                        descriptionElement.id = 'videoDescription';
+                        descriptionElement.style.marginTop = '15px';
+                        modalContent.appendChild(descriptionElement);
+                    }
+                    descriptionElement.textContent = videoDescription;
+                });
+            });
+
+            closeBtn.addEventListener('click', function () {
+                modal.style.display = 'none';
+                iframe.src = ''; // Очищаем src, чтобы остановить видео
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                    iframe.src = ''; // Очищаем src, чтобы остановить видео
+                }
+            });
+
+
         });
 
         function goBack() {

@@ -23,12 +23,15 @@
 {% endblock %}
 
 {% block content %}
-    <div id="map" style="height: 100vh;"></div>
-    <div id="map-overlay" class="select-point-message">Выберите точку на карте</div>
-    <button id="confirm-point-btn" class="btn btn-primary confirm-selection">Подтвердить</button>
-    {% if user.is_authenticated %}
-        <button id="add-project-button" class="btn btn-primary add-project-button">Добавить объект</button>
-    {% else %}
-        <a href="{% url 'signin' %}" class="btn btn-primary add-project-button">Войти</a>
-    {% endif %}
+<div id="map" style="height: 100vh;"></div>
+<div id="map-overlay" class="select-point-message">Выберите точку на карте</div>
+<div class="button-container" style="display: none;">
+    <button id="confirm-point-btn" class="btn btn-primary">Подтвердить</button>
+    <button id="cancel-selection-btn" class="btn btn-secondary">Отмена</button>
+</div>
+{% if user.is_authenticated %}
+    <button id="add-project-button" class="btn btn-primary add-project-button">Добавить объект</button>
+{% else %}
+    <a href="{% url 'signin' %}" class="btn btn-primary add-project-button">Войти</a>
+{% endif %}
 {% endblock %}
