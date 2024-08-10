@@ -53,30 +53,32 @@
                 </a>
             </li>
 
-            <li class="sidebar-header">Фильтр по проектам</li>
-            <li class="sidebar-item">
-                <button id="reset-filters" class="btn btn-secondary w-100 mb-3">Сбросить фильтры</button>
-                <ul class="sidebar-dropdown list-unstyled">
-                    {% for category in categories %}
-                        <li class="sidebar-item">
-                            <a class="sidebar-link category-filter" data-category-id="{{ category.id }}">
-                                <i class="align-middle" style="color: {{ category.color }};" data-feather="archive"></i>
-                                <span class="align-middle">{{ category.name }}</span>
-                            </a>
-                            <ul class="list-unstyled" style="display: none;">
-                                {% for type in category.types.all %}
-                                    <li class="sidebar-item">
-                                        <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
-                                            <i class="align-middle" style="color: {{ type.color }};"
-                                               data-feather="circle"></i> {{ type.name }}
-                                        </a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
+            {% if request.resolver_match.url_name == 'map' %}
+                <li class="sidebar-header">Фильтр по проектам</li>
+                <li class="sidebar-item">
+                    <button id="reset-filters" class="btn btn-secondary w-100 mb-3">Сбросить фильтры</button>
+                    <ul class="sidebar-dropdown list-unstyled">
+                        {% for category in categories %}
+                            <li class="sidebar-item">
+                                <a class="sidebar-link category-filter" data-category-id="{{ category.id }}">
+                                    <i class="align-middle" style="color: {{ category.color }};" data-feather={{ category.icon}}></i>
+                                    <span class="align-middle">{{ category.name }}</span>
+                                </a>
+                                <ul class="list-unstyled" style="display: none;">
+                                    {% for type in category.types.all %}
+                                        <li class="sidebar-item">
+                                            <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
+                                                <i class="align-middle" style="color: {{ type.color }};"
+                                                   data-feather={{ category.icon}}></i> {{ type.name }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
         </ul>
         <div class="sidebar-cta">
             <div class="sidebar-cta-content text-center">
@@ -192,4 +194,7 @@
         background-color: rgba(0, 123, 255, 0.1); /* светло-синий фон для активного состояния */
         border-left: 3px solid #007bff; /* синяя линия слева для активного состояния */
     }
+    .sidebar-nav .sidebar-item .type-filter {
+    padding-left: 40px; /*  для смещения типов*/
+}
 </style>

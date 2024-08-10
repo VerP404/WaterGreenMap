@@ -31,42 +31,40 @@
                 </div>
             </div>
 
-            <div class="header">
-                <div class="header-content">
-                    <h1>{{ project.title }}</h1>
-                    <div class="tags">
-                        <!-- Ссылка на отфильтрованные проекты по категории -->
-                        <a href="{% url 'project_list' %}?categories={{ project.main_type.category.id }}"
-                           style="background: {{ project.main_type.category.color }}; color: #fff;" class="tag-link">
-                            {{ project.main_type.category.name }}
-                        </a>
-                        <!-- Основной тип -->
-                        <a href="{% url 'project_list' %}?types={{ project.main_type.id }}"
-                           style="background: {{ project.main_type.color }}; color: #fff;" class="tag-link">
-                            {{ project.main_type.name }}
-                        </a>
+<div class="header">
+    <div class="header-content">
+        <h1>{{ project.title }}</h1>
+<div class="tags">
+    <!-- Ссылка на отфильтрованные проекты по категории -->
+    <a href="{% url 'project_list' %}?categories={{ project.main_type.category.id }}"
+       style="border-color: {{ project.main_type.category.color }};" class="tag-link">
+        <i class="align-middle" data-feather="{{ project.main_type.category.icon }}" style="color: {{ project.main_type.category.color }};"></i>
+        {{ project.main_type.category.name }}
+    </a>
 
-                        <!-- Дополнительные типы -->
-                        {% for additional_type in project.additional_types.all %}
-                            <a href="{% url 'project_list' %}?types={{ additional_type.id }}"
-                               style="background: {{ additional_type.color }}; color: #fff;" class="tag-link">
-                                {{ additional_type.name }}
-                            </a>
-                        {% endfor %}
-                    </div>
-                    <p class="created-by">Дата публикации: {{ project.created_at|date:"d-m-Y" }}</p>
-                </div>
-                <div class="profile">
-                    <div class="details">
-                        <p><i class="align-middle"
-                              data-feather="user"></i> {{ project.user.first_name }} {{ project.user.last_name }}</p>
-                        <p><i class="align-middle" data-feather="calendar"></i> Участник проекта
-                            с {{ project.user.registration_date|date:"d-m-Y" }}</p>
-                        <p><i class="align-middle" data-feather="folder"></i> Опубликовано
-                            проектов: {{ user_projects_count }}</p>
-                    </div>
-                </div>
-            </div>
+    <!-- Отображение уникальных типов -->
+    {% for type in unique_types %}
+        <a href="{% url 'project_list' %}?types={{ type.id }}"
+           style="border-color: {{ type.color }};" class="tag-link">
+            <i class="align-middle" data-feather="{{ type.category.icon }}" style="color: {{ type.color }};"></i>
+            {{ type.name }}
+        </a>
+    {% endfor %}
+</div>
+
+
+
+
+        <p class="created-by">Дата публикации: {{ project.created_at|date:"d-m-Y" }}</p>
+    </div>
+    <div class="profile">
+        <div class="details">
+            <p><i class="align-middle" data-feather="user"></i> {{ project.user.first_name }} {{ project.user.last_name }}</p>
+            <p><i class="align-middle" data-feather="calendar"></i> Участник проекта с {{ project.user.registration_date|date:"d-m-Y" }}</p>
+            <p><i class="align-middle" data-feather="folder"></i> Опубликовано проектов: {{ user_projects_count }}</p>
+        </div>
+    </div>
+</div>
 
             <div class="about">
                 <h3>Описание объекта</h3>
@@ -102,6 +100,37 @@
     </div>
 
     <style>
+.tag-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 12px; /* Закругленные углы */
+    background-color: rgba(0, 18, 37, 0.04); /* Серый фон */
+    color: rgb(0, 18, 37); /* Черный цвет текста */
+    border: 2px solid; /* Обводка цветом из базы данных */
+    text-decoration: none; /* Отключение подчеркивания */
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 5px; /* Расстояние между тегами */
+}
+
+.tag-link i {
+    margin-right: 5px; /* Отступ для иконки */
+    color: inherit; /* Иконка наследует цвет из inline-style */
+}
+
+.tag-link:hover {
+    background-color: #e0e0e0; /* Фон при наведении */
+    text-decoration: none; /* Отключение подчеркивания при наведении */
+}
+
+
+
+
+
+
+
+
         .card {
             width: 100%;
             max-width: 1100px;
