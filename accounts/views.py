@@ -23,6 +23,7 @@ class SignUpView(CreateView):
                 messages.error(self.request, f"{field.label}: {error}")
         return super().form_invalid(form)
 
+
 class SignInView(LoginView):
     template_name = 'registration/signin.html'
     authentication_form = CustomAuthenticationForm
@@ -37,6 +38,7 @@ class SignInView(LoginView):
             for error in field.errors:
                 messages.error(self.request, f"{field.label}: {error}")
         return super().form_invalid(form)
+
 
 class SignOutView(LogoutView):
     next_page = reverse_lazy('map')
