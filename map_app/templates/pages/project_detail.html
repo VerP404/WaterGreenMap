@@ -140,22 +140,32 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 1px solid #e0e0e0;
-            flex-wrap: wrap; /* Added for responsive adjustment */
-        }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #e0e0e0;
+    flex-wrap: wrap; /* Разрешаем перенос содержимого */
+}
 
-        .header-content {
-            flex: 1; /* Ensures the header content takes up available space */
-        }
+.header-content {
+    flex: 1; /* Занимаем доступное пространство */
+    min-width: 200px; /* Минимальная ширина заголовка, чтобы не сжимался слишком сильно */
+    margin-bottom: 10px; /* Отступ снизу для заголовка */
+}
 
-        .header .tags {
-            display: flex;
-            gap: 10px;
-        }
+.header .tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* Разрешаем перенос тегов */
+    margin-top: 10px; /* Добавляем отступ сверху для тегов */
+    justify-content: flex-start; /* Выравниваем теги в начало строки */
+    width: 100%; /* Ширина 100% для переноса на новую строку */
+}
+
+.header .tags a {
+    margin-bottom: 5px; /* Отступ снизу между строками тегов */
+}
 
         .header .tags span {
             padding: 5px 10px;
