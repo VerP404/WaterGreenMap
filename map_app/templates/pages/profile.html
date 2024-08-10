@@ -42,7 +42,15 @@
         margin-bottom: 20px; /* Добавить отступ после профиля */
     }
 }
+@media (max-width: 1500px) {
+    .btn-edit-profile .btn-text {
+        display: none; /* Скрыть текст */
+    }
 
+    .btn-edit-profile {
+        padding: 0 10px; /* Уменьшить отступы */
+    }
+}
 
     </style>
 <main class="content">
@@ -52,9 +60,9 @@
                     <div class="card mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Пользователь</h5>
-                            <a href="{% url 'profile_edit' %}" class="btn btn-sm btn-outline-secondary">
-                                <i class="align-middle" data-feather="edit"></i> Редактировать
-                            </a>
+                            <a href="{% url 'profile_edit' %}" class="btn btn-sm btn-outline-secondary btn-edit-profile">
+    <i class="align-middle" data-feather="edit"></i> <span class="btn-text">Редактировать</span>
+</a>
                         </div>
                         <div class="card-body text-center">
                             <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/avatars/user.png' %}{% endif %}"
