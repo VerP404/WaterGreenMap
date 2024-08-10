@@ -117,18 +117,23 @@ def add_project(request):
             project.latitude = request.POST.get('latitude')
             project.longitude = request.POST.get('longitude')
 
+            # Проверяем, включена ли авто-публикация для пользователя
+            project.is_published = request.user.auto_publish
+
             # Сохранение экосистемных услуг
             ecosystem_services_desired = request.POST.getlist('ecosystem_services_desired')
             project.ecosystem_services_desired = json.dumps(ecosystem_services_desired)
 
             project.save()
 
-            # Сохранение дополнительных типов, исключая основной тип
-            additional_types = form.cleaned_data['additional_types']
-            main_type = form.cleaned_data['main_type']
-            additional_types = additional_types.exclude(id=main_type.id)
-            project.additional_types.set(additional_types)
+            # Сохранение дополнительных типов
+            project.additional_type_1 = form.cleaned_data['additional_type_1']
+            project.additional_type_2 = form.cleaned_data['additional_type_2']
+            project.additional_type_3 = form.cleaned_data['additional_type_3']
 
+            project.save()
+
+            # Сохранение фото, видео и ссылок
             photo_formset.instance = project
             photo_formset.save()
 
@@ -177,11 +182,12 @@ def add_project(request):
         'photo_formset': photo_formset,
         'video_formset': video_formset,
         'link_formset': link_formset,
+        'range_1_to_4': range(1, 4),  # Передаем диапазон в контекст для шаблона
     })
 
 
 def get_types_by_category(request, category_id):
-    types = Type.objects.filter(category_id=category_id)
+    types = Type.objects.filter(category_id=category_id).order_by('name')
     types_list = [{'id': type.id, 'name': type.name} for type in types]
     return JsonResponse({'types': types_list})
 
@@ -195,11 +201,24 @@ def get_types_by_categories(request):
 
 def project_detail_view(request, pk):
     project = get_object_or_404(Project, pk=pk)
+
+    # Собираем все типы в один список, исключая дубликаты
+    all_types = [project.main_type]
+    if project.additional_type_1 and project.additional_type_1 not in all_types:
+        all_types.append(project.additional_type_1)
+    if project.additional_type_2 and project.additional_type_2 not in all_types:
+        all_types.append(project.additional_type_2)
+    if project.additional_type_3 and project.additional_type_3 not in all_types:
+        all_types.append(project.additional_type_3)
+
     user_projects_count = Project.objects.filter(user=project.user, is_published=True).count()
+
     return render(request, 'pages/project_detail.html', {
         'project': project,
+        'unique_types': all_types,  # Передаем уникальные типы в шаблон
         'user_projects_count': user_projects_count
     })
+
 
 
 def about_view(request):
