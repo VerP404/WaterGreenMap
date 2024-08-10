@@ -21,6 +21,32 @@
         .project-row {
             cursor: pointer; /* Добавляем курсор указателя для строк таблицы */
         }
+
+        @media (max-width: 380px) {
+            .btn-group .btn-text {
+                display: none; /* Скрыть текст в кнопках */
+            }
+
+            .btn-group .btn {
+                padding: 0 10px; /* Уменьшить отступы для кнопок */
+            }
+        }
+        @media (max-width: 767px) {
+    .row {
+        display: flex;
+        flex-direction: column-reverse; /* Изменение порядка колонок */
+    }
+
+    .filter-card {
+        order: 1; /* Фильтры идут первыми */
+        margin-bottom: 20px; /* Добавить отступ после фильтров */
+    }
+
+    .project-list-card {
+        order: 2; /* Список проектов идет вторым */
+    }
+}
+
     </style>
     <main class="content">
         <div class="container-fluid p-0">
@@ -68,12 +94,13 @@
                     <div class="mb-3">
                         <h1 class="h3 d-inline align-middle">Список проектов</h1>
                         <div class="btn-group float-end">
-                            <button id="tableViewBtn" class="btn btn-primary btn-sm"><i class="align-middle"
-                                                                                        data-feather="list"></i> список
+                            <button id="tableViewBtn" class="btn btn-primary btn-sm">
+                                <i class="align-middle" data-feather="list"></i>
+                                <span class="btn-text">список</span>
                             </button>
-                            <button id="gridViewBtn" class="btn btn-outline-primary btn-sm"><i class="align-middle"
-                                                                                               data-feather="grid"></i>
-                                сетка
+                            <button id="gridViewBtn" class="btn btn-outline-primary btn-sm">
+                                <i class="align-middle" data-feather="grid"></i>
+                                <span class="btn-text">сетка</span>
                             </button>
                         </div>
                     </div>
