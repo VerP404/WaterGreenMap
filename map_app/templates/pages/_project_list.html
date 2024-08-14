@@ -1,8 +1,5 @@
 {% load static %}
 <div class="card">
-    <div class="card-header">
-        <h5 class="card-title mb-0">Список проектов</h5>
-    </div>
     <div class="card-body h-100">
         <!-- Table View -->
         <div id="tableView" class="table-responsive">
@@ -13,24 +10,32 @@
                     <th scope="col">Название</th>
                     <th scope="col">Тип объекта</th>
                     <th scope="col">Автор</th>
+                    {% if show_user_column %}
+                        <th scope="col">Добавлено</th>
+                    {% endif %}
                     <th scope="col">Дата добавления</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for project in projects %}
-                <tr class="project-row" onclick="window.location.href='{% url 'project_detail' project.pk %}'">
-                    <td>
-                        {% if project.photos.all %}
-                            <img src="{{ project.photos.all.0.image.url }}" width="50" class="img-fluid" alt="Project Image">
-                        {% else %}
-                            <img src="{% static 'img/logo/placeholder.jpg' %}" width="50" class="img-fluid" alt="Project Image">
+                    <tr class="project-row" onclick="window.location.href='{% url 'project_detail' project.pk %}'">
+                        <td>
+                            {% if project.photos.all %}
+                                <img src="{{ project.photos.all.0.image.url }}" width="50" class="img-fluid"
+                                     alt="Project Image">
+                            {% else %}
+                                <img src="{% static 'img/logo/placeholder.jpg' %}" width="50" class="img-fluid"
+                                     alt="Project Image">
+                            {% endif %}
+                        </td>
+                        <td>{{ project.title }}</td>
+                        <td>{{ project.main_type.name }}</td>
+                        <td>{{ project.project_author|default_if_none:"-" }}</td>
+                        {% if show_user_column %}
+                            <td>{{ project.user.last_name }} {{ project.user.first_name }}</td>
                         {% endif %}
-                    </td>
-                    <td>{{ project.title }}</td>
-                    <td>{{ project.main_type.name }}</td>
-                    <td>{{ project.user.last_name }} {{ project.user.first_name }}</td>
-                    <td>{{ project.created_at|date:"Y-m-d" }}</td>
-                </tr>
+                        <td>{{ project.created_at|date:"Y-m-d" }}</td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -38,21 +43,26 @@
         <!-- Grid View -->
         <div id="gridView" class="row d-none">
             {% for project in projects %}
-            <div class="col-md-4">
-                <div class="card project-card" onclick="window.location.href='{% url 'project_detail' project.pk %}'">
-                    {% if project.photos.all %}
-                        <img src="{{ project.photos.all.0.image.url }}" class="card-img-top" alt="Project Image">
-                    {% else %}
-                        <img src="{% static 'img/logo/placeholder.jpg' %}" class="card-img-top" alt="Project Image">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ project.title }}</h5>
-                        <p class="card-text">{{ project.main_type.name }}</p>
-                        <p class="card-text">Автор: {{ project.user.last_name }} {{ project.user.first_name }}</p>
-                        <p class="text-muted">{{ project.created_at|date:"Y-m-d" }}</p>
+                <div class="col-md-4">
+                    <div class="card project-card"
+                         onclick="window.location.href='{% url 'project_detail' project.pk %}'">
+                        {% if project.photos.all %}
+                            <img src="{{ project.photos.all.0.image.url }}" class="card-img-top" alt="Project Image">
+                        {% else %}
+                            <img src="{% static 'img/logo/placeholder.jpg' %}" class="card-img-top" alt="Project Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ project.title }}</h5>
+                            <p class="card-text">{{ project.main_type.name }}</p>
+                            <p class="card-text">Автор: {{ project.project_author|default_if_none:"-" }}</p>
+                            {% if show_user_column %}
+                                <p class="card-text">
+                                    Добавлено: {{ project.user.last_name }} {{ project.user.first_name }}</p>
+                            {% endif %}
+                            <p class="text-muted">{{ project.created_at|date:"Y-m-d" }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
     </div>
@@ -85,11 +95,17 @@
     });
 </script>
 <style>
+    .custom-title {
+        font-size: 1.25rem; /* Увеличенный размер шрифта */
+        color: #01203f; /* Темно-синий цвет */
+    }
+
     .project-card img {
         width: 100%;
         height: 200px;
         object-fit: cover;
     }
+
     .project-card {
         display: flex;
         flex-direction: column;
@@ -98,10 +114,12 @@
         cursor: pointer; /* Добавляем курсор указателя для карточек */
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
     .project-card:hover {
         transform: scale(1.05);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+
     .project-row {
         cursor: pointer; /* Добавляем курсор указателя для строк таблицы */
     }

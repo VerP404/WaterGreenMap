@@ -55,6 +55,19 @@
                     </div>
 
 
+                    <div class="d-flex align-items-center">
+                    <span class="address">
+                        <i data-feather="map-pin"></i>
+                        {{ project.country|default:"-" }},
+                        {{ project.city|default:"-" }},
+                        {{ project.street|default:"-" }},
+                        {{ project.house_number|default:"-" }}
+                    </span>
+                        <span id="coordinates" class="coordinates-copy ms-3" data-bs-toggle="tooltip"
+                              title="Координаты скопированы!">
+                            <i data-feather="copy"></i> {{ project.latitude|floatformat:4 }}, {{ project.longitude|floatformat:4 }}
+                        </span>
+                    </div>
                     <p class="created-by">Дата публикации: {{ project.created_at|date:"d-m-Y" }}</p>
                 </div>
                 <div class="profile">
@@ -72,11 +85,12 @@
             <div class="about">
                 <h3>Описание объекта</h3>
                 <p>{{ project.description }}</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#projectModal">
+                    Просмотреть всю информацию
+                </button>
             </div>
-            <div class="about">
-                <h3>Подробнее об объектах категории: {{ project.main_type.category.name }}</h3>
-                <div class="category-description">{{ project.main_type.category.description|safe }}</div>
-            </div>
+
+
             <div class="links">
                 <h3>Ссылки на дополнительные материалы</h3>
                 {% for link in project.links.all %}
@@ -102,7 +116,95 @@
         </div>
     </div>
 
+    <!-- Модальное окно с полной информацией -->
+    <div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="projectModalLabel">{{ project.title }}</h5>
+                </div>
+                <div class="modal-body">
+                    <h5>Подробная информация о проекте</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Дополнительные данные об объекте</h5>
+                                    <p><strong>Год создания:</strong> {{ project.creation_year|default:"-" }}</p>
+                                    <p><strong>Год проектирования:</strong> {{ project.design_year|default:"-" }}</p>
+                                    <p><strong>Автор проекта:</strong> {{ project.project_author|default:"-" }}</p>
+                                    <p><strong>Описание проекта:</strong> {{ project.project_description|default:"-" }}
+                                    </p>
+                                    <p><strong>Дополнительная
+                                        информация:</strong> {{ project.additional_info|default:"-" }}</p>
+                                    <p><strong>Награды:</strong> {{ project.awards|default:"-" }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Мониторинг</h5>
+                                    <p><strong>Ведется ли
+                                        мониторинг:</strong> {{ project.is_monitoring|yesno:"Да,Нет" }}</p>
+                                    <p><strong>Какие параметры
+                                        измеряются:</strong> {{ project.monitoring_parameters|default:"-" }}</p>
+                                    <p><strong>С какого года работает
+                                        система:</strong> {{ project.monitoring_start_year|default:"-" }}</p>
+                                    <p><strong>Какое оборудование
+                                        используется:</strong> {{ project.monitoring_equipment|default:"-" }}</p>
+                                    <p><strong>Кто собственник системы
+                                        мониторинга:</strong> {{ project.monitoring_owner|default:"-" }}</p>
+                                    <p><strong>Открыты ли данные:</strong> {{ project.is_data_open|yesno:"Да,Нет" }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Экосистемные услуги</h5>
+                                    <p><strong>Измерялись ли на вашем объекте экосистемные
+                                        услуги:</strong> {{ project.is_ecosystem_services_measured|yesno:"Да,Нет" }}</p>
+                                    {#                                    <p><strong>Какие экосистемные услуги вы бы хотели измерить?</strong></p>#}
+                                    {#                                    {% if project.ecosystem_services_desired %}#}
+                                    {#                                        <ul>#}
+                                    {#                                            {% for service in project.ecosystem_services_desired %}#}
+                                    {#                                                <li>{{ service }}</li>#}
+                                    {#                                            {% endfor %}#}
+                                    {#                                        </ul>#}
+                                    {#                                    {% else %}#}
+                                    {#                                        <p>-</p>#}
+                                    {#                                    {% endif %}#}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <style>
+        .modal-body .card {
+            margin-bottom: 20px;
+        }
+
+        .modal-body .card-title {
+            font-size: 18px;
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+        }
+
         .tag-link {
             display: inline-flex;
             align-items: center;
@@ -364,8 +466,65 @@
                 padding-bottom: 10px;
             }
         }
-    </style>
 
+
+        .coordinates-container {
+            margin-top: 10px;
+        }
+
+        .coordinates-copy {
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none; /* Убираем подчеркивание */
+        }
+
+        .tooltip-inner {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            font-size: 14px;
+            border-radius: 5px;
+            padding: 8px 10px;
+        }
+
+        .tooltip-arrow::before {
+            border-top-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-dialog {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100% - 50px); /* Высота модального окна с отступом в 25px сверху и снизу */
+            margin: 0;
+        }
+
+        .modal-content {
+            margin-top: auto; /* Отступ сверху */
+            margin-bottom: auto; /* Отступ снизу */
+        }
+
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const coordinatesElement = document.getElementById('coordinates');
+
+            coordinatesElement.addEventListener('click', function () {
+                const coordinatesText = this.textContent.trim().replace('copy', '').trim();
+                navigator.clipboard.writeText(coordinatesText).then(() => {
+                    const tooltip = new bootstrap.Tooltip(coordinatesElement);
+                    coordinatesElement.setAttribute('title', 'Координаты скопированы!');
+                    tooltip.show();
+
+                    setTimeout(() => {
+                        tooltip.dispose();
+                    }, 2000);
+                });
+            });
+
+            feather.replace(); // Инициализация иконок Feather
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             feather.replace(); // Инициализация иконок Feather

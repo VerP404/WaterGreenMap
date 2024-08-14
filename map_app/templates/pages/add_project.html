@@ -13,7 +13,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Основная информация</h5>
+                            <h5 class="card-title mb-0 custom-title">Основная информация</h5>
                         </div>
                         <div class="card-body">
                             <form method="post" enctype="multipart/form-data">
@@ -30,14 +30,23 @@
                                 </div>
                                 <input type="hidden" name="latitude" value="{{ request.GET.lat }}">
                                 <input type="hidden" name="longitude" value="{{ request.GET.lng }}">
-                                <div class="d-flex">
+                                <div class="d-flex flex-wrap">
                                     <div class="me-2 flex-fill">
                                         <label class="form-label" for="id_country">Страна</label>
                                         <input type="text" name="country" id="id_country" class="form-control">
                                     </div>
-                                    <div class="flex-fill">
+                                    <div class="me-2 flex-fill">
                                         <label class="form-label" for="id_city">Город</label>
                                         <input type="text" name="city" id="id_city" class="form-control">
+                                    </div>
+                                    <div class="me-2 flex-fill">
+                                        <label class="form-label" for="id_street">Улица</label>
+                                        <input type="text" name="street" id="id_street" class="form-control">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <label class="form-label" for="id_house_number">Дом</label>
+                                        <input type="text" name="house_number" id="id_house_number" class="form-control"
+                                               style="width: 80px;">
                                     </div>
                                 </div>
                         </div>
@@ -48,7 +57,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Категория объекта</h5>
+                            <h5 class="card-title mb-0 custom-title">Категория объекта</h5>
                         </div>
                         <div class="card-body">
                             <div id="category-container">
@@ -113,7 +122,7 @@
                 <div class="col-12 col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Фотографии, видео, ссылки</h5>
+                            <h5 class="card-title mb-0 custom-title">Фотографии, видео, ссылки</h5>
                         </div>
                         <div class="card-body">
                             {{ photo_formset.management_form }}
@@ -177,7 +186,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Дополнительные данные об объекте</h5>
+                            <h5 class="card-title mb-0 custom-title">Дополнительные данные об объекте</h5>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
@@ -201,6 +210,10 @@
                                 <label class="form-label" for="id_additional_info">Дополнительная информация</label>
                                 <input type="text" name="additional_info" id="id_additional_info" class="form-control">
                             </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="id_awards">Награды</label>
+                                <input type="text" name="awards" id="id_awards" class="form-control">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -208,7 +221,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Мониторинг</h5>
+                            <h5 class="card-title mb-0 custom-title">Мониторинг</h5>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
@@ -258,7 +271,7 @@
                 <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Экосистемные услуги</h5>
+                            <h5 class="card-title mb-0 custom-title">Экосистемные услуги</h5>
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
@@ -277,7 +290,8 @@
                                     основных.</label>
                                 <div>
                                     <div class="ecosystem-category">
-                                        <label class="ecosystem-category-title"><strong>Вода</strong></label>
+                                        <label class="ecosystem-category-title"><strong>Вода</strong> <i
+                                                class="align-middle" data-feather="chevron-down"></i></label>
                                         <div class="ecosystem-services-list" style="display: none;">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox"
@@ -346,7 +360,8 @@
                                         </div>
                                     </div>
                                     <div class="ecosystem-category">
-                                        <label class="ecosystem-category-title"><strong>Почва</strong></label>
+                                        <label class="ecosystem-category-title"><strong>Почва</strong> <i
+                                                class="align-middle" data-feather="chevron-down"></i></label>
                                         <div class="ecosystem-services-list" style="display: none;">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox"
@@ -407,7 +422,8 @@
                                         </div>
                                     </div>
                                     <div class="ecosystem-category">
-                                        <label class="ecosystem-category-title"><strong>Растения</strong></label>
+                                        <label class="ecosystem-category-title"><strong>Растения</strong> <i
+                                                class="align-middle" data-feather="chevron-down"></i></label>
                                         <div class="ecosystem-services-list" style="display: none;">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox"
@@ -528,10 +544,76 @@
 {% block extra_scripts %}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const maxFileSize = 5 * 1024 * 1024;  // Максимальный размер файла 5 МБ
+            const validImageFormats = ["image/jpeg", "image/png", "image/gif"];  // Допустимые форматы файлов
+
+            const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
+
+            photoInputs.forEach(input => {
+                input.addEventListener('change', function () {
+                    const file = this.files[0];
+                    const alertBox = document.createElement('div');
+                    alertBox.classList.add('custom-alert');
+
+                    if (file) {
+                        // Проверка размера файла
+                        if (file.size > maxFileSize) {
+                            alertBox.textContent = 'Размер файла не должен превышать 5 МБ.';
+                            this.parentElement.appendChild(alertBox);
+                            this.value = '';  // Очищаем поле, если файл не подходит
+
+                            setTimeout(() => {
+                                alertBox.classList.add('show');
+                            }, 10);
+
+                            setTimeout(() => {
+                                alertBox.classList.remove('show');
+                                setTimeout(() => alertBox.remove(), 300);
+                            }, 3000);
+
+                            return;
+                        }
+
+                        // Проверка типа файла
+                        if (!validImageFormats.includes(file.type)) {
+                            alertBox.textContent = 'Недопустимый формат файла. Разрешены только JPEG, PNG, GIF.';
+                            this.parentElement.appendChild(alertBox);
+                            this.value = '';  // Очищаем поле, если файл не подходит
+
+                            setTimeout(() => {
+                                alertBox.classList.add('show');
+                            }, 10);
+
+                            setTimeout(() => {
+                                alertBox.classList.remove('show');
+                                setTimeout(() => alertBox.remove(), 300);
+                            }, 3000);
+
+                            return;
+                        }
+
+                        // Если все ок, показываем предварительный просмотр изображения
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.previousElementSibling && this.previousElementSibling.remove();
+                            this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        });
+
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
             const latitude = document.querySelector('input[name="latitude"]').value;
             const longitude = document.querySelector('input[name="longitude"]').value;
             const countryField = document.getElementById('id_country');
             const cityField = document.getElementById('id_city');
+            const streetField = document.getElementById('id_street');
+            const houseNumberField = document.getElementById('id_house_number');
 
             if (latitude && longitude) {
                 fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
@@ -540,38 +622,40 @@
                         if (data.address) {
                             countryField.value = data.address.country || '';
                             cityField.value = data.address.city || data.address.town || data.address.village || '';
+                            streetField.value = data.address.road || ''; // Fill street
+                            houseNumberField.value = data.address.house_number || ''; // Fill house number
                         }
                     })
                     .catch(error => console.error('Error:', error));
             }
-                const maxServices = 5;
+            const maxServices = 5;
 
-                // Добавляем обработчик для всех чекбоксов экосистемных услуг
-                const serviceCheckboxes = document.querySelectorAll('.ecosystem-services-list .form-check-input');
+            // Добавляем обработчик для всех чекбоксов экосистемных услуг
+            const serviceCheckboxes = document.querySelectorAll('.ecosystem-services-list .form-check-input');
 
-                serviceCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function () {
-                        const selectedServices = document.querySelectorAll('.ecosystem-services-list .form-check-input:checked');
+            serviceCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const selectedServices = document.querySelectorAll('.ecosystem-services-list .form-check-input:checked');
 
-                        if (selectedServices.length > maxServices) {
-                            this.checked = false; // Отменяем выбор, если больше 5 услуг
-                        }
-                    });
+                    if (selectedServices.length > maxServices) {
+                        this.checked = false; // Отменяем выбор, если больше 5 услуг
+                    }
                 });
+            });
 
-                // Скрипт для раскрытия экосистемных услуг
-                const ecosystemCategories = document.querySelectorAll('.ecosystem-category-title');
+            // Скрипт для раскрытия экосистемных услуг
+            const ecosystemCategories = document.querySelectorAll('.ecosystem-category-title');
 
-                ecosystemCategories.forEach(category => {
-                    category.addEventListener('click', function () {
-                        const servicesList = this.nextElementSibling;
-                        if (servicesList.style.display === 'none' || servicesList.style.display === '') {
-                            servicesList.style.display = 'block';
-                        } else {
-                            servicesList.style.display = 'none';
-                        }
-                    });
+            ecosystemCategories.forEach(category => {
+                category.addEventListener('click', function () {
+                    const servicesList = this.nextElementSibling;
+                    if (servicesList.style.display === 'none' || servicesList.style.display === '') {
+                        servicesList.style.display = 'block';
+                    } else {
+                        servicesList.style.display = 'none';
+                    }
                 });
+            });
 
 
             // Скрипт для загрузки и отображения фото
@@ -694,6 +778,32 @@
     </script>
 
     <style>
+        .custom-title {
+            font-size: 1.25rem; /* Увеличенный размер шрифта */
+            color: #01203f; /* Темно-синий цвет */
+        }
+
+        .custom-alert {
+            position: absolute;
+            background-color: rgb(189, 1, 1); /* Сделаем фон немного темнее */
+            color: white;
+            padding: 10px 20px; /* Увеличим внутренние отступы */
+            border-radius: 8px; /* Более округлые углы */
+            font-size: 14px;
+            z-index: 1000;
+            transform: translateY(-120%);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Добавим тень для более выразительного эффекта */
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease; /* Добавим плавное появление и исчезновение */
+            max-width: 300px; /* Увеличим максимальную ширину */
+        }
+
+        .custom-alert.show {
+            opacity: 1;
+            transform: translateY(-100%);
+        }
+
+
         .upload-container {
             display: flex;
             flex-wrap: wrap;
@@ -735,5 +845,25 @@
         .ecosystem-category-title {
             cursor: pointer;
         }
+
+        @media (max-width: 368px) {
+            .upload-container .upload-box {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .d-flex.flex-wrap > div {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .d-flex.flex-wrap .flex-grow-1 {
+                width: 100%;
+            }
+        }
+
     </style>
+
 {% endblock %}

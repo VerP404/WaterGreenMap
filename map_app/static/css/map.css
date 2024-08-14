@@ -4,6 +4,11 @@ html, body {
     padding: 0;
 }
 
+.custom-title {
+    font-size: 1.25rem; /* Увеличенный размер шрифта */
+    color: #01203f; /* Темно-синий цвет */
+}
+
 .wrapper {
     display: flex;
     height: 100%;

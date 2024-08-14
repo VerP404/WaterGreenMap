@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+
 from .models import Project, Photo, Video, Link, Category, Type
 
 
@@ -35,8 +37,8 @@ class ProjectForm(forms.ModelForm):
             'additional_category_1', 'additional_type_1',
             'additional_category_2', 'additional_type_2',
             'additional_category_3', 'additional_type_3',
-            'country', 'city', 'creation_year', 'design_year',
-            'project_author', 'project_description', 'additional_info',
+            'country', 'city', 'street', 'house_number', 'creation_year', 'design_year',
+            'project_author', 'project_description', 'additional_info', 'awards',
             'is_monitoring', 'monitoring_parameters', 'monitoring_start_year',
             'monitoring_equipment', 'monitoring_owner', 'is_data_open',
             'is_ecosystem_services_measured', 'ecosystem_services_measured',
@@ -75,7 +77,35 @@ class ProjectForm(forms.ModelForm):
             field.widget.attrs['class'] = 'form-control'
 
 
-PhotoFormSet = forms.inlineformset_factory(Project, Photo, fields=('image', 'description', 'is_main'), extra=4,
-                                           can_delete=True)
-VideoFormSet = forms.inlineformset_factory(Project, Video, fields=('video', 'description'), extra=1, can_delete=True)
-LinkFormSet = forms.inlineformset_factory(Project, Link, fields=('url', 'description'), extra=1, can_delete=True)
+# PhotoFormSet = forms.inlineformset_factory(Project, Photo, fields=('image', 'description', 'is_main'), extra=4,
+#                                            can_delete=True)
+def validate_image(image):
+    # Ограничение размера файла (5 МБ)
+    max_size = 5 * 1024 * 1024  # 5 MB
+    if image.size > max_size:
+        raise ValidationError(f"Размер файла не может превышать 5 МБ.")
+
+    # Допустимые форматы изображений
+    valid_image_formats = ["image/jpeg", "image/png", "image/gif"]
+    if image.content_type not in valid_image_formats:
+        raise ValidationError(f"Допустимые форматы изображений: JPEG, PNG, GIF.")
+
+
+class PhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['image', 'description', 'is_main']
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image:
+            validate_image(image)
+        return image
+
+
+PhotoFormSet = forms.inlineformset_factory(
+    Project, Photo, form=PhotoForm, extra=4, can_delete=True
+)
+
+VideoFormSet = forms.inlineformset_factory(Project, Video, fields=('video', 'description'), extra=2, can_delete=True)
+LinkFormSet = forms.inlineformset_factory(Project, Link, fields=('url', 'description'), extra=2, can_delete=True)

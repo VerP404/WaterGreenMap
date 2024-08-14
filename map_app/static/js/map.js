@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', function () {
             var popupContent = `
                 <div>
                     <h3>${project.title}</h3>
-                    <p>${project.description}</p>
                     <a href="/project/${project.id}">Открыть объект</a>
                 </div>`;
             marker.bindPopup(popupContent);

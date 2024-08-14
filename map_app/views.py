@@ -116,6 +116,8 @@ def add_project(request):
             project.user = request.user
             project.latitude = request.POST.get('latitude')
             project.longitude = request.POST.get('longitude')
+            project.street = form.cleaned_data['street']
+            project.house_number = form.cleaned_data['house_number']
 
             # Проверяем, включена ли авто-публикация для пользователя
             project.is_published = request.user.auto_publish
