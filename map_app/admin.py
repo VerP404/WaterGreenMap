@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Type, Project, Photo, Video, Link, AboutPage
+from .models import Category, Type, Project, Photo, Video, Link, AboutPage, CatalogItem
 from django.utils.html import format_html
 
 
@@ -70,6 +70,11 @@ class PhotoAdmin(admin.ModelAdmin):
     image_tag.short_description = 'Preview'
 
 
+@admin.register(CatalogItem)
+class CatalogItemAdmin(admin.ModelAdmin):
+    list_display = ('title', 'parent')
+
+
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
     list_display = ('project', 'video', 'description')
@@ -83,7 +88,7 @@ class LinkAdmin(admin.ModelAdmin):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = (
-    'title', 'main_type', 'user', 'is_published', 'created_at', 'image_preview', 'video_links', 'additional_links')
+        'title', 'main_type', 'user', 'is_published', 'created_at', 'image_preview', 'video_links', 'additional_links')
     list_filter = ('main_type', 'user', 'is_published')
     search_fields = ('title', 'description', 'user__username')
     list_editable = ('is_published',)

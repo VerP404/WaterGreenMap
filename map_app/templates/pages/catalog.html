@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}ВЗИК | Каталог{% endblock %}
+
+{% block content %}
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Навигация -->
+            <div class="col-md-3 d-flex flex-column h-100">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Навигация</h5>
+                    </div>
+                    <div class="card-body p-2" style="overflow-y: auto;">
+                        <ul id="catalogAccordion" class="list-unstyled">
+                            {% for item in catalog_items %}
+                                <li>
+                                    <div class="d-flex align-items-center">
+                                        {% if item.children.exists %}
+                                            <i class="align-middle toggle-icon" data-feather="chevron-right"
+                                               data-id="{{ item.id }}" aria-expanded="false"></i>
+                                        {% else %}
+                                            <i class="align-middle" data-feather="minus"></i>
+                                        {% endif %}
+                                        <a href="?item={{ item.id }}" class="ms-2">{{ item.title }}</a>
+                                    </div>
+                                    {% if item.children.exists %}
+                                        <ul id="collapse{{ item.id }}" class="collapse list-unstyled ms-3">
+                                            {% for child in item.children.all %}
+                                                <li>
+                                                    <div class="d-flex align-items-center">
+                                                        {% if child.children.exists %}
+                                                            <i class="align-middle toggle-icon"
+                                                               data-feather="chevron-right"
+                                                               data-id="{{ child.id }}" aria-expanded="false"></i>
+                                                        {% else %}
+                                                            <i class="align-middle" data-feather="minus"></i>
+                                                        {% endif %}
+                                                        <a href="?item={{ child.id }}"
+                                                           class="ms-2">{{ child.title }}</a>
+                                                    </div>
+                                                    {% if child.children.exists %}
+                                                        <ul id="collapse{{ child.id }}"
+                                                            class="collapse list-unstyled ms-3">
+                                                            {% for subchild in child.children.all %}
+                                                                <li>
+                                                                    <i class="align-middle" data-feather="minus"></i>
+                                                                    <a href="?item={{ subchild.id }}"
+                                                                       class="ms-2">{{ subchild.title }}</a>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Контент -->
+            <div class="col-md-9 d-flex flex-column h-100">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Контент</h5>
+                    </div>
+                    <div class="card-body overflow-auto">
+                        {% if selected_item %}
+                            <h3>{{ selected_item.title }}</h3>
+                            <p>{{ selected_item.content }}</p>
+                        {% else %}
+                            <p>Выберите элемент из каталога для просмотра его содержимого.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .container-fluid {
+            height: 100vh;
+            padding-top: 20px;
+        }
+
+        .card-body {
+            overflow-y: auto;
+        }
+
+        .row {
+            height: 100%;
+        }
+
+        .toggle-icon {
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .collapse.show + .toggle-icon {
+            transform: rotate(90deg);
+        }
+
+    </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Инициализация feather-icons после полной загрузки страницы
+        feather.replace();
+
+        // Восстанавливаем состояние разворотов из localStorage
+        const expandedItems = JSON.parse(localStorage.getItem('expandedItems')) || [];
+
+        expandedItems.forEach(id => {
+            const element = document.querySelector(`#collapse${id}`);
+            if (element) {
+                element.classList.add('show');
+                const icon = document.querySelector(`[data-id="${id}"]`);
+                if (icon) {
+                    icon.setAttribute('data-feather', 'chevron-down');
+                }
+            }
+        });
+
+        feather.replace();
+
+        // Добавляем обработчики событий на все toggle-icon элементы
+        document.querySelectorAll('.toggle-icon').forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Предотвращаем любые другие действия
+
+                const id = this.getAttribute('data-id');
+                const target = document.querySelector(`#collapse${id}`);
+
+                if (target) { // Проверяем, существует ли элемент
+                    if (target.classList.contains('show')) {
+                        // Свернуть элемент
+                        target.classList.remove('show');
+                        const index = expandedItems.indexOf(id);
+                        if (index > -1) {
+                            expandedItems.splice(index, 1);
+                        }
+                        this.setAttribute('data-feather', 'chevron-right');
+                    } else {
+                        // Развернуть элемент
+                        target.classList.add('show');
+                        expandedItems.push(id);
+                        this.setAttribute('data-feather', 'chevron-down');
+                    }
+                    localStorage.setItem('expandedItems', JSON.stringify(expandedItems));
+                    feather.replace(); // Обновление иконок после изменения
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

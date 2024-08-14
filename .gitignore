@@ -2,3 +2,4 @@
 .venv
 .idea
 /projects/migrations/
+db.sqlite3

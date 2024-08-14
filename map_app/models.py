@@ -100,3 +100,12 @@ class AboutPage(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class CatalogItem(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField(blank=True, null=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+
+    def __str__(self):
+        return self.title

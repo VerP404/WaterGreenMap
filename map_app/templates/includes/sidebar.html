@@ -7,34 +7,6 @@
             <span class="ms-2 display-5 font-weight-bold text-uppercase text-white">ВЗИК</span>
         </a>
         <ul class="sidebar-nav">
-            {% if user.is_authenticated %}
-                <li class="sidebar-header">Профиль</li>
-                <li class="sidebar-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-                    <a class="sidebar-link" href="{% url 'profile' %}">
-                        <i class="align-middle" data-feather="user"></i> <span class="align-middle">Профиль</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <form method="post" action="{% url 'logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="sidebar-link btn btn-link">
-                            <i class="align-middle" data-feather="log-out"></i> <span class="align-middle">Выйти</span>
-                        </button>
-                    </form>
-                </li>
-            {% else %}
-                <li class="sidebar-header">Авторизация</li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{% url 'signin' %}">
-                        <i class="align-middle" data-feather="log-in"></i> <span class="align-middle">Войти</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a class="sidebar-link" href="{% url 'signup' %}">
-                        <i class="align-middle" data-feather="user-plus"></i> <span class="align-middle">Зарегистрироваться</span>
-                    </a>
-                </li>
-            {% endif %}
 
             <li class="sidebar-header">Меню сайта</li>
             <li class="sidebar-item {% if request.resolver_match.url_name == 'map' %}active{% endif %}">
@@ -52,7 +24,11 @@
                     <i class="align-middle" data-feather="info"></i> <span class="align-middle">О проекте</span>
                 </a>
             </li>
-
+            <li class="sidebar-item {% if request.resolver_match.url_name == 'catalog' %}active{% endif %}">
+                <a class="sidebar-link" href="{% url 'catalog' %}">
+                    <i class="align-middle" data-feather="book-open"></i> <span class="align-middle">Каталог</span>
+                </a>
+            </li>
             {% if request.resolver_match.url_name == 'map' %}
                 <li class="sidebar-header">Фильтр по проектам</li>
                 <li class="sidebar-item">

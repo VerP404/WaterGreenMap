@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from WaterGreenMap import settings
 from map_app.forms import ProjectForm, PhotoFormSet, VideoFormSet, LinkFormSet
-from map_app.models import Type, Link, Video, Photo, Project, Category, AboutPage
+from map_app.models import Type, Link, Video, Photo, Project, Category, AboutPage, CatalogItem
 from django.contrib import messages
 
 
@@ -222,7 +222,20 @@ def project_detail_view(request, pk):
     })
 
 
-
 def about_view(request):
     about_page = AboutPage.objects.first()
     return render(request, 'pages/about.html', {'about_page': about_page})
+
+
+def catalog_view(request):
+    catalog_items = CatalogItem.objects.filter(parent__isnull=True)
+    selected_item_id = request.GET.get('item')
+    selected_item = None
+
+    if selected_item_id:
+        selected_item = get_object_or_404(CatalogItem, id=selected_item_id)
+
+    return render(request, 'pages/catalog.html', {
+        'catalog_items': catalog_items,
+        'selected_item': selected_item,
+    })
