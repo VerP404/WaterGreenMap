@@ -40,6 +40,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=20, blank=True)
     position = models.CharField(max_length=100, blank=True)
     activity_area = models.ForeignKey(ActivityArea, on_delete=models.SET_NULL, null=True, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)

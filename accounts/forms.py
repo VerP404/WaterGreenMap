@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser, ActivityArea
 
-
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control form-control-lg',
@@ -31,6 +30,14 @@ class CustomUserCreationForm(UserCreationForm):
     activity_area = forms.ModelChoiceField(queryset=ActivityArea.objects.all(), widget=forms.Select(attrs={
         'class': 'form-control form-control-lg',
     }), required=True)
+    country = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control form-control-lg',
+        'placeholder': 'Введите вашу страну',
+    }))
+    city = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control form-control-lg',
+        'placeholder': 'Введите ваш город',
+    }))
 
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control form-control-lg',
@@ -44,8 +51,9 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = (
-            'email', 'first_name', 'last_name', 'password1', 'password2', 'workplace', 'phone', 'position',
-            'activity_area')
+            'email', 'first_name', 'last_name', 'password1', 'password2', 'workplace', 'phone',
+            'position', 'activity_area', 'country', 'city'
+        )
 
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -62,7 +70,10 @@ class CustomAuthenticationForm(AuthenticationForm):
 class CustomUserChangeForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'phone', 'workplace', 'position', 'activity_area', 'avatar']
+        fields = [
+            'first_name', 'last_name', 'phone', 'workplace', 'position',
+            'activity_area', 'country', 'city', 'avatar'
+        ]
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -70,6 +81,8 @@ class CustomUserChangeForm(forms.ModelForm):
             'workplace': forms.TextInput(attrs={'class': 'form-control'}),
             'position': forms.TextInput(attrs={'class': 'form-control'}),
             'activity_area': forms.Select(attrs={'class': 'form-control'}),
+            'country': forms.TextInput(attrs={'class': 'form-control'}),
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'first_name': 'Имя',
@@ -78,5 +91,7 @@ class CustomUserChangeForm(forms.ModelForm):
             'workplace': 'Место работы',
             'position': 'Должность',
             'activity_area': 'Сфера деятельности',
+            'country': 'Страна',
+            'city': 'Город',
             'avatar': 'Аватар',
         }
