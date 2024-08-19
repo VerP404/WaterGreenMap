@@ -111,11 +111,10 @@
                                             <label class="form-check">
                                                 {{ form.agree_to_terms }}
                                                 <span class="form-check-label">
-    Я согласен с <a href="{% url 'document_detail' slug='privacy_policy' %}" target="_blank">политикой обработки персональных данных</a> и <a
-                                                        href="{% url 'document_detail' slug='terms_of_service' %}"
-                                                        target="_blank">условиями использования</a>.
+    Я согласен с <a href="{% url 'document_download' slug='privacy_policy' %}" download>политикой обработки персональных данных</a> и <a
+                                                        href="{% url 'document_download' slug='terms_of_service' %}"
+                                                        download>условиями использования</a>.
 </span>
-
                                             </label>
                                         </div>
                                         <div class="text-center mt-3">

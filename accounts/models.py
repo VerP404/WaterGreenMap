@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -59,18 +60,37 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
+def validate_pdf(file):
+    if not file.name.endswith('.pdf'):
+        raise ValidationError('Только файлы PDF допустимы.')
+
+
 class LegalDocument(models.Model):
     DOCUMENT_CHOICES = [
         ('privacy_policy', 'Политика обработки персональных данных'),
         ('terms_of_service', 'Условия использования'),
     ]
 
-    title = models.CharField(max_length=255, choices=DOCUMENT_CHOICES, unique=True, verbose_name="Название документа")
-    file = models.FileField(upload_to='documents/', verbose_name="Файл документа")
+    title = models.CharField(max_length=255, choices=DOCUMENT_CHOICES, verbose_name="Тип документа")
     version = models.CharField(max_length=50, verbose_name="Версия документа")
+    file = models.FileField(upload_to='documents/', validators=[validate_pdf], verbose_name="Файл документа")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    class Meta:
+        unique_together = ('title', 'version')
+
+    def save(self, *args, **kwargs):
+        if self.file:
+            original_name = self.file.name
+            extension = original_name.split('.')[-1]
+            new_name = f"{self.get_title_display()}_{self.version}.{extension}"
+            self.file.name = new_name
+
+            # Проверка уникальности файла
+            if LegalDocument.objects.filter(file=self.file.name).exists():
+                raise ValidationError('Файл с такой версии существует!')
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.get_title_display()} (Версия: {self.version})"
-
-

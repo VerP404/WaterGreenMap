@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
+from django.http import FileResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
@@ -62,8 +63,11 @@ class ProfileUpdateView(UpdateView):
         return self.request.user
 
 
-class DocumentDetailView(DetailView):
+class DocumentDownloadView(DetailView):
     model = LegalDocument
-    template_name = 'documents/document_detail.html'
     slug_field = 'title'
     slug_url_kwarg = 'slug'
+
+    def get(self, request, *args, **kwargs):
+        document = self.get_object()
+        return FileResponse(document.file, as_attachment=True)
