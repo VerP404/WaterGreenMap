@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import CustomUser, ActivityArea
 
+
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
         'class': 'form-control form-control-lg',
@@ -47,6 +48,8 @@ class CustomUserCreationForm(UserCreationForm):
         'class': 'form-control form-control-lg',
         'placeholder': 'Подтвердите пароль',
     }))
+    agree_to_terms = forms.BooleanField(required=True,
+                                        label='Я согласен с политикой обработки персональных данных и условиями использования.')
 
     class Meta:
         model = CustomUser

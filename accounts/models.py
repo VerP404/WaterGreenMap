@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
+
 class ActivityArea(models.Model):
     name = models.CharField(max_length=100)
 
@@ -47,6 +48,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     registration_date = models.DateTimeField(default=timezone.now)
     auto_publish = models.BooleanField(default=False)
+    agreed_to_terms = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
@@ -55,3 +57,20 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class LegalDocument(models.Model):
+    DOCUMENT_CHOICES = [
+        ('privacy_policy', 'Политика обработки персональных данных'),
+        ('terms_of_service', 'Условия использования'),
+    ]
+
+    title = models.CharField(max_length=255, choices=DOCUMENT_CHOICES, unique=True, verbose_name="Название документа")
+    file = models.FileField(upload_to='documents/', verbose_name="Файл документа")
+    version = models.CharField(max_length=50, verbose_name="Версия документа")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    def __str__(self):
+        return f"{self.get_title_display()} (Версия: {self.version})"
+
+

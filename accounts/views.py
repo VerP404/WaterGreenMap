@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, CustomUserChangeForm
-from .models import CustomUser
+from .models import CustomUser, LegalDocument
 
 
 class SignUpView(CreateView):
@@ -14,6 +15,9 @@ class SignUpView(CreateView):
     success_url = reverse_lazy('map')
 
     def form_valid(self, form):
+        user = form.save(commit=False)
+        user.agreed_to_terms = form.cleaned_data.get('agree_to_terms')
+        user.save()
         messages.success(self.request, 'Регистрация прошла успешно!')
         return super().form_valid(form)
 
@@ -34,10 +38,9 @@ class SignInView(LoginView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        for field in form:
-            for error in field.errors:
-                messages.error(self.request, f"{field.label}: {error}")
-        return super().form_invalid(form)
+        # Если логин или пароль неверны, будет отображено общее сообщение
+        messages.error(self.request, 'Неверный логин или пароль. Попробуйте еще раз.')
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class SignOutView(LogoutView):
@@ -57,3 +60,10 @@ class ProfileUpdateView(UpdateView):
 
     def get_object(self):
         return self.request.user
+
+
+class DocumentDetailView(DetailView):
+    model = LegalDocument
+    template_name = 'documents/document_detail.html'
+    slug_field = 'title'
+    slug_url_kwarg = 'slug'

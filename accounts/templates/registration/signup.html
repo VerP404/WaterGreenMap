@@ -107,6 +107,17 @@
                                             <label class="form-label">Подтверждение пароля</label>
                                             {{ form.password2 }}
                                         </div>
+                                        <div class="mb-3">
+                                            <label class="form-check">
+                                                {{ form.agree_to_terms }}
+                                                <span class="form-check-label">
+    Я согласен с <a href="{% url 'document_detail' slug='privacy_policy' %}" target="_blank">политикой обработки персональных данных</a> и <a
+                                                        href="{% url 'document_detail' slug='terms_of_service' %}"
+                                                        target="_blank">условиями использования</a>.
+</span>
+
+                                            </label>
+                                        </div>
                                         <div class="text-center mt-3">
                                             <button type="submit" class="btn btn-lg btn-primary w-100 mb-2">
                                                 Зарегистрироваться
