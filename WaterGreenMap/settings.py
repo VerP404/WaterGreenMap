@@ -133,12 +133,6 @@ MESSAGE_TAGS = {
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
-# # Настройка HTTPS в зависимости от операционной системы
-# if not IS_WINDOWS:
-#     SECURE_SSL_REDIRECT = True
-#     CSRF_COOKIE_SECURE = True
-#     SESSION_COOKIE_SECURE = True
-# else:
-#     SECURE_SSL_REDIRECT = False
-#     CSRF_COOKIE_SECURE = False
-#     SESSION_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
