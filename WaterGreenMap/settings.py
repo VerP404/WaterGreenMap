@@ -1,10 +1,15 @@
 import os
+import platform
 from pathlib import Path
+
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Определение операционной системы
+IS_WINDOWS = platform.system() == 'Windows'
+print(IS_WINDOWS)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -12,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i165q5a#*#a+l1u((+yqlmmhk+=zn7c14sj@pdcv3s6ugc6(w-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = IS_WINDOWS
 
 ALLOWED_HOSTS = ['*', '185.38.84.3']
 
@@ -127,3 +132,13 @@ MESSAGE_TAGS = {
 }
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
+
+# Настройка HTTPS в зависимости от операционной системы
+if not IS_WINDOWS:
+    SECURE_SSL_REDIRECT = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+else:
+    SECURE_SSL_REDIRECT = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False

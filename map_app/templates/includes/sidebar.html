@@ -37,7 +37,8 @@
                         {% for category in categories %}
                             <li class="sidebar-item">
                                 <a class="sidebar-link category-filter" data-category-id="{{ category.id }}">
-                                    <i class="align-middle" style="color: {{ category.color }};" data-feather={{ category.icon}}></i>
+                                    <i class="align-middle" style="color: {{ category.color }};"
+                                       data-feather={{ category.icon }}></i>
                                     <span class="align-middle">{{ category.name }}</span>
                                 </a>
                                 <ul class="list-unstyled" style="display: none;">
@@ -45,7 +46,7 @@
                                         <li class="sidebar-item">
                                             <a class="sidebar-link type-filter" data-type-id="{{ type.id }}">
                                                 <i class="align-middle" style="color: {{ type.color }};"
-                                                   data-feather={{ category.icon}}></i> {{ type.name }}
+                                                   data-feather={{ category.icon }}></i> {{ type.name }}
                                             </a>
                                         </li>
                                     {% endfor %}
@@ -170,7 +171,18 @@
         background-color: rgba(0, 123, 255, 0.1); /* светло-синий фон для активного состояния */
         border-left: 3px solid #007bff; /* синяя линия слева для активного состояния */
     }
+
     .sidebar-nav .sidebar-item .type-filter {
-    padding-left: 40px; /*  для смещения типов*/
-}
+        padding-left: 40px; /*  для смещения типов*/
+
+    }
+    .sidebar-cta {
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-cta-content {
+        padding: 0;
+        margin: 0;
+    }
 </style>
