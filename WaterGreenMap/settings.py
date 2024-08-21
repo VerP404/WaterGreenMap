@@ -17,9 +17,9 @@ print(IS_WINDOWS)
 SECRET_KEY = 'django-insecure-i165q5a#*#a+l1u((+yqlmmhk+=zn7c14sj@pdcv3s6ugc6(w-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = IS_WINDOWS
+DEBUG = False
 
-ALLOWED_HOSTS = ['*', '185.38.84.3']
+ALLOWED_HOSTS = ['*', '185.38.84.3', 'bluegreenmap.ru', 'www.bluegreenmap.ru']
 
 # Application definition
 
@@ -133,6 +133,6 @@ MESSAGE_TAGS = {
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
-SECURE_SSL_REDIRECT = False
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
