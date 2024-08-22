@@ -1,9 +1,14 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.db import models
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-
+from django.urls import reverse
 
 class ActivityArea(models.Model):
     name = models.CharField(max_length=100)
@@ -50,12 +55,28 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     registration_date = models.DateTimeField(default=timezone.now)
     auto_publish = models.BooleanField(default=False)
     agreed_to_terms = models.BooleanField(default=False)
+    email_confirmed = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+    def send_confirmation_email(self, request):
+        token = default_token_generator.make_token(self)
+        uid = urlsafe_base64_encode(force_bytes(self.pk))
+        confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': token})
+        confirmation_url = request.build_absolute_uri(confirmation_link)
 
+        subject = 'Подтверждение регистрации'
+        message = render_to_string('emails/confirmation_email.html', {
+            'user': self,
+            'confirmation_url': confirmation_url,
+        })
+        send_mail(subject, message, None, [self.email])
+
+    def confirm_email(self):
+        self.email_confirmed = True
+        self.save()
     def __str__(self):
         return self.email
 

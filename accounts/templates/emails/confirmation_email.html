@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Подтверждение регистрации</title>
+</head>
+<body>
+    <p>Здравствуйте, {{ user.first_name }}!</p>
+    <p>Спасибо за регистрацию на нашем сайте. Пожалуйста, подтвердите ваш email, перейдя по ссылке ниже:</p>
+    <p><a href="{{ confirmation_url }}">Подтвердить email</a></p>
+</body>
+</html>

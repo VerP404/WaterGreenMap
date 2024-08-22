@@ -9,7 +9,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Определение операционной системы
 IS_WINDOWS = platform.system() == 'Windows'
-print(IS_WINDOWS)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -17,7 +16,7 @@ print(IS_WINDOWS)
 SECRET_KEY = 'django-insecure-i165q5a#*#a+l1u((+yqlmmhk+=zn7c14sj@pdcv3s6ugc6(w-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = IS_WINDOWS
 
 ALLOWED_HOSTS = ['*', '185.38.84.3', 'bluegreenmap.ru', 'www.bluegreenmap.ru']
 
@@ -133,6 +132,15 @@ MESSAGE_TAGS = {
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
-SECURE_SSL_REDIRECT = True
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+# Настройки для отправки писем через Яндекс Почту
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'dmitriirod@yandex.ru'  # замените на ваш email
+EMAIL_HOST_PASSWORD = 'hnrcytiehxrrxkljasdasd'  # замените на ваш пароль
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
