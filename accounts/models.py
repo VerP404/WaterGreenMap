@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
@@ -9,6 +11,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.urls import reverse
+
 
 class ActivityArea(models.Model):
     name = models.CharField(max_length=100)
@@ -61,25 +64,31 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
     def send_confirmation_email(self, request):
-        token = default_token_generator.make_token(self)
-        uid = urlsafe_base64_encode(force_bytes(self.pk))
-        confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': token})
-        confirmation_url = request.build_absolute_uri(confirmation_link)
+        try:
+            token = default_token_generator.make_token(self)
+            uid = urlsafe_base64_encode(force_bytes(self.pk))
+            confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': token})
+            confirmation_url = request.build_absolute_uri(confirmation_link)
 
-        subject = 'Подтверждение регистрации'
-        html_content = render_to_string('emails/confirmation_email.html', {
-            'user': self,
-            'confirmation_url': confirmation_url,
-        })
+            subject = 'Подтверждение регистрации'
+            html_content = render_to_string('emails/confirmation_email.html', {
+                'user': self,
+                'confirmation_url': confirmation_url,
+            })
 
-        email = EmailMultiAlternatives(subject, '', None, [self.email])
-        email.attach_alternative(html_content, "text/html")
-        email.send()
+            email = EmailMultiAlternatives(subject, '', None, [self.email])
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+        except Exception as e:
+            logging.error(f"Ошибка при отправке письма: {e}")
+            raise e
 
     def confirm_email(self):
         self.email_confirmed = True
         self.save()
+
     def __str__(self):
         return self.email
 
