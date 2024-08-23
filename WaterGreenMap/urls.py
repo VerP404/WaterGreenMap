@@ -5,7 +5,7 @@ from django.conf import settings
 from map_app.views import map, profile_view, project_list_view, add_project, get_types_by_category, \
     get_types_by_categories, update_map, project_detail_view, about_view, catalog_view
 from django.conf.urls.static import static
-
+handler404 = 'map_app.views.my_custom_page_not_found_view'
 urlpatterns = [
                   path('admin/', admin.site.urls),
                   path('ckeditor/', include('ckeditor_uploader.urls')),
