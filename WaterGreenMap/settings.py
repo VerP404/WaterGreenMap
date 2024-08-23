@@ -35,8 +35,6 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'ckeditor',
     'ckeditor_uploader',
-
-    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -136,9 +134,9 @@ MESSAGE_TAGS = {
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
-SECURE_SSL_REDIRECT = env('SECURE_SSL_REDIRECT')
-CSRF_COOKIE_SECURE = env('CSRF_COOKIE_SECURE')
-SESSION_COOKIE_SECURE = env('SESSION_COOKIE_SECURE')
+SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
 # Настройки для отправки писем через Яндекс Почту
 EMAIL_BACKEND = env('EMAIL_BACKEND')
