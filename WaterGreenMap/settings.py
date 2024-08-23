@@ -81,8 +81,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'watergreenmap',  # Имя базы данных
-        'USER': env('USER'),          # Имя пользователя
-        'PASSWORD': env('PASSWORD'),  # Пароль
+        'USER': 'watergreenmap',          # Имя пользователя
+        'PASSWORD': 'password!24',  # Пароль
         'HOST': 'localhost',       # Адрес сервера базы данных
         'PORT': '5432',            # Порт PostgreSQL (по умолчанию 5432)
     }
