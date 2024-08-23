@@ -5,63 +5,78 @@ from ckeditor.fields import RichTextField
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    color = models.CharField(max_length=7)  # HEX color code
-    icon = models.CharField(max_length=50, default="archive")  # Имя иконки
+    name = models.CharField(max_length=255, verbose_name="Название категории")
+    description = models.TextField(blank=True, null=True, verbose_name="Описание")
+    color = models.CharField(max_length=7, verbose_name="Цвет")  # HEX color code
+    icon = models.CharField(max_length=50, default="archive", verbose_name="Иконка")  # Имя иконки
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
 
 class Type(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    color = models.CharField(max_length=7)  # HEX color code
-    category = models.ForeignKey(Category, related_name='types', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, verbose_name="Название типа")
+    description = models.TextField(blank=True, null=True, verbose_name="Описание")
+    color = models.CharField(max_length=7, verbose_name="Цвет")  # HEX color code
+    category = models.ForeignKey(Category, related_name='types', on_delete=models.CASCADE, verbose_name="Категория")
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Тип"
+        verbose_name_plural = "Типы"
+
 
 class Project(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    main_type = models.ForeignKey(Type, related_name='main_projects', on_delete=models.CASCADE)
+    title = models.CharField(max_length=255, verbose_name="Название проекта")
+    description = models.TextField(verbose_name="Описание")
+    latitude = models.FloatField(verbose_name="Широта")
+    longitude = models.FloatField(verbose_name="Долгота")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
+    main_type = models.ForeignKey(Type, related_name='main_projects', on_delete=models.CASCADE,
+                                  verbose_name="Основной тип")
     additional_type_1 = models.ForeignKey(Type, related_name='additional_projects_1', on_delete=models.CASCADE,
-                                          null=True, blank=True)
+                                          null=True, blank=True, verbose_name="Дополнительный тип 1")
     additional_type_2 = models.ForeignKey(Type, related_name='additional_projects_2', on_delete=models.CASCADE,
-                                          null=True, blank=True)
+                                          null=True, blank=True, verbose_name="Дополнительный тип 2")
     additional_type_3 = models.ForeignKey(Type, related_name='additional_projects_3', on_delete=models.CASCADE,
-                                          null=True, blank=True)
-    is_published = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    country = models.CharField(max_length=100, null=True)
-    city = models.CharField(max_length=100, null=True)
-    street = models.CharField(max_length=255, blank=True, null=True)
-    house_number = models.CharField(max_length=50, blank=True, null=True)
-    creation_year = models.CharField(max_length=4, blank=True, null=True)
-    design_year = models.CharField(max_length=4, blank=True, null=True)
-    project_author = models.CharField(max_length=255, blank=True, null=True)
-    project_description = models.TextField(blank=True, null=True)
-    additional_info = models.TextField(blank=True, null=True)
-    awards = models.TextField(blank=True, null=True)
-    is_monitoring = models.BooleanField(default=False)
-    monitoring_parameters = models.TextField(blank=True, null=True)
-    monitoring_start_year = models.CharField(max_length=4, blank=True, null=True)
-    monitoring_equipment = models.CharField(max_length=255, blank=True, null=True)
-    monitoring_owner = models.CharField(max_length=255, blank=True, null=True)
-    is_data_open = models.BooleanField(default=False)
-    is_ecosystem_services_measured = models.BooleanField(default=False)
-    ecosystem_services_measured = models.TextField(blank=True, null=True)
-    ecosystem_services_desired = models.JSONField(blank=True, null=True, default=list)
+                                          null=True, blank=True, verbose_name="Дополнительный тип 3")
+    is_published = models.BooleanField(default=False, verbose_name="Опубликован")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
+    country = models.CharField(max_length=100, null=True, verbose_name="Страна")
+    city = models.CharField(max_length=100, null=True, verbose_name="Город")
+    street = models.CharField(max_length=255, blank=True, null=True, verbose_name="Улица")
+    house_number = models.CharField(max_length=50, blank=True, null=True, verbose_name="Номер дома")
+    creation_year = models.CharField(max_length=4, blank=True, null=True, verbose_name="Год создания")
+    design_year = models.CharField(max_length=4, blank=True, null=True, verbose_name="Год проектирования")
+    project_author = models.CharField(max_length=255, blank=True, null=True, verbose_name="Автор проекта")
+    project_description = models.TextField(blank=True, null=True, verbose_name="Описание проекта")
+    additional_info = models.TextField(blank=True, null=True, verbose_name="Дополнительная информация")
+    awards = models.TextField(blank=True, null=True, verbose_name="Награды")
+    is_monitoring = models.BooleanField(default=False, verbose_name="Мониторинг")
+    monitoring_parameters = models.TextField(blank=True, null=True, verbose_name="Параметры мониторинга")
+    monitoring_start_year = models.CharField(max_length=4, blank=True, null=True, verbose_name="Год начала мониторинга")
+    monitoring_equipment = models.CharField(max_length=255, blank=True, null=True,
+                                            verbose_name="Оборудование мониторинга")
+    monitoring_owner = models.CharField(max_length=255, blank=True, null=True, verbose_name="Владелец мониторинга")
+    is_data_open = models.BooleanField(default=False, verbose_name="Данные открыты")
+    is_ecosystem_services_measured = models.BooleanField(default=False, verbose_name="Экосистемные услуги измерены")
+    ecosystem_services_measured = models.TextField(blank=True, null=True, verbose_name="Измеренные экосистемные услуги")
+    ecosystem_services_desired = models.JSONField(blank=True, null=True, default=list,
+                                                  verbose_name="Желаемые экосистемные услуги")
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name = "Проект"
+        verbose_name_plural = "Проекты"
 
 
 def project_photo_path(instance, filename):
@@ -75,6 +90,10 @@ class Photo(models.Model):
     description = models.TextField(blank=True)
     is_main = models.BooleanField(default=False)
 
+    class Meta:
+        verbose_name = "Фотографию"
+        verbose_name_plural = "Фотографии"
+
 
 class Video(models.Model):
     project = models.ForeignKey(Project, related_name='videos', on_delete=models.CASCADE)
@@ -83,6 +102,10 @@ class Video(models.Model):
 
     def __str__(self):
         return f'Video for {self.project.title}'
+
+    class Meta:
+        verbose_name = "Видео"
+        verbose_name_plural = "Видео"
 
 
 class Link(models.Model):
@@ -93,6 +116,10 @@ class Link(models.Model):
     def __str__(self):
         return self.url
 
+    class Meta:
+        verbose_name = "Доп. материал"
+        verbose_name_plural = "Доп. материалы"
+
 
 class AboutPage(models.Model):
     title = models.CharField(max_length=255, default="О проекте")
@@ -100,6 +127,10 @@ class AboutPage(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name = "О проекте"
+        verbose_name_plural = "О проекте"
 
 
 class CatalogItem(models.Model):
@@ -109,3 +140,7 @@ class CatalogItem(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name = "Каталог"
+        verbose_name_plural = "Каталог"

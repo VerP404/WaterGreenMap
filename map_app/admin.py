@@ -89,8 +89,8 @@ class LinkAdmin(admin.ModelAdmin):
 class ProjectAdmin(admin.ModelAdmin):
     list_display = (
         'title', 'main_type', 'user', 'is_published', 'created_at', 'image_preview', 'video_links', 'additional_links')
-    list_filter = ('main_type', 'user', 'is_published')
-    search_fields = ('title', 'description', 'user__username')
+    list_filter = ('main_type', 'user', 'is_published', 'country', 'city', 'creation_year')
+    search_fields = ('title', 'description', 'user__email')
     list_editable = ('is_published',)
     inlines = [PhotoInline, VideoInline, LinkInline]
 
@@ -104,16 +104,16 @@ class ProjectAdmin(admin.ModelAdmin):
         if photos.exists():
             photo = photos.first()
             return format_html('<img src="{}" style="width: 100px; height: auto;" />', photo.image.url)
-        return "No Image"
+        return "Нет изображения"
 
-    image_preview.short_description = "Preview Image"
+    image_preview.short_description = "Превью"
 
     def video_links(self, obj):
         videos = obj.videos.all()
         links = [format_html('<a href="{}" target="_blank">{}</a>', video.video, video.description) for video in videos]
         return format_html("<br>".join(links))
 
-    video_links.short_description = "Video Links"
+    video_links.short_description = "Ссылки на видео"
 
     def additional_links(self, obj):
         links = obj.links.all()
@@ -121,4 +121,4 @@ class ProjectAdmin(admin.ModelAdmin):
                             links]
         return format_html("<br>".join(additional_links))
 
-    additional_links.short_description = "Additional Links"
+    additional_links.short_description = "Дополнительные ссылки"
