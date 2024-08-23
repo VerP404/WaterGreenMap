@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import SignUpView, SignInView, SignOutView, ProfileUpdateView, DocumentDownloadView, ConfirmEmailView
 
 urlpatterns = [

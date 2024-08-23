@@ -11,13 +11,18 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.urls import reverse
+from django.utils.crypto import get_random_string
 
 
 class ActivityArea(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name="Название")
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Сфера деятельности"
+        verbose_name_plural = "Сферы деятельности"
 
 
 class CustomUserManager(BaseUserManager):
@@ -43,54 +48,67 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    workplace = models.CharField(max_length=100, blank=True)
-    phone = models.CharField(max_length=20, blank=True)
-    position = models.CharField(max_length=100, blank=True)
-    activity_area = models.ForeignKey(ActivityArea, on_delete=models.SET_NULL, null=True, blank=True)
-    country = models.CharField(max_length=100, blank=True)
-    city = models.CharField(max_length=100, blank=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    registration_date = models.DateTimeField(default=timezone.now)
-    auto_publish = models.BooleanField(default=False)
-    agreed_to_terms = models.BooleanField(default=False)
-    email_confirmed = models.BooleanField(default=False)
+    email = models.EmailField(unique=True, verbose_name="Email")
+    first_name = models.CharField(max_length=30, blank=True, verbose_name="Имя")
+    last_name = models.CharField(max_length=30, blank=True, verbose_name="Фамилия")
+    workplace = models.CharField(max_length=100, blank=True, verbose_name="Место работы")
+    phone = models.CharField(max_length=20, blank=True, verbose_name="Телефон")
+    position = models.CharField(max_length=100, blank=True, verbose_name="Должность")
+    activity_area = models.ForeignKey(ActivityArea, on_delete=models.SET_NULL, null=True, blank=True,
+                                      verbose_name="Сфера деятельности")
+    country = models.CharField(max_length=100, blank=True, verbose_name="Страна")
+    city = models.CharField(max_length=100, blank=True, verbose_name="Город")
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+    is_staff = models.BooleanField(default=False, verbose_name="Персонал")
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True, verbose_name="Аватар")
+    registration_date = models.DateTimeField(default=timezone.now, verbose_name="Дата регистрации")
+    auto_publish = models.BooleanField(default=False, verbose_name="Авто-публикация")
+    agreed_to_terms = models.BooleanField(default=False, verbose_name="Согласие с условиями")
+    email_confirmed = models.BooleanField(default=False, verbose_name="Email подтвержден")
+    email_confirmation_token = models.CharField(max_length=64, blank=True, null=True,
+                                                verbose_name="Токен подтверждения Email")
 
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    def generate_email_confirmation_token(self):
+        self.email_confirmation_token = get_random_string(length=64)
+        self.save()
+
     def send_confirmation_email(self, request):
-        try:
-            token = default_token_generator.make_token(self)
-            uid = urlsafe_base64_encode(force_bytes(self.pk))
-            confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': token})
-            confirmation_url = request.build_absolute_uri(confirmation_link)
+        self.generate_email_confirmation_token()
+        uid = urlsafe_base64_encode(force_bytes(self.pk))
+        confirmation_link = reverse('confirm_email', kwargs={'uidb64': uid, 'token': self.email_confirmation_token})
+        confirmation_url = request.build_absolute_uri(confirmation_link)
 
-            subject = 'Подтверждение регистрации'
-            html_content = render_to_string('emails/confirmation_email.html', {
-                'user': self,
-                'confirmation_url': confirmation_url,
-            })
+        print(f"Generated Token (Email): {self.email_confirmation_token}")
+        print(f"UID (Email): {uid}")
+        print(f"Confirmation URL (Email): {confirmation_url}")
 
-            email = EmailMultiAlternatives(subject, '', None, [self.email])
-            email.attach_alternative(html_content, "text/html")
-            email.send()
-        except Exception as e:
-            logging.error(f"Ошибка при отправке письма: {e}")
-            raise e
+        subject = 'Подтверждение регистрации'
+        html_content = render_to_string('emails/confirmation_email.html', {
+            'user': self,
+            'confirmation_url': confirmation_url,
+        })
+
+        email = EmailMultiAlternatives(subject, '', None, [self.email])
+        email.attach_alternative(html_content, "text/html")
+        email.send()
 
     def confirm_email(self):
         self.email_confirmed = True
+        self.is_active = True
+        self.email_confirmation_token = None  # очищаем токен после использования
         self.save()
 
     def __str__(self):
         return self.email
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
 
 
 def validate_pdf(file):
@@ -111,6 +129,8 @@ class LegalDocument(models.Model):
 
     class Meta:
         unique_together = ('title', 'version')
+        verbose_name = "Политику и условия"
+        verbose_name_plural = "Политики и условия"
 
     def save(self, *args, **kwargs):
         if self.file:
