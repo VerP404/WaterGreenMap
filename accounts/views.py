@@ -12,6 +12,7 @@ from .models import CustomUser, LegalDocument
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.views import View
+from django.utils.encoding import force_str
 
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
@@ -80,7 +81,7 @@ class DocumentDownloadView(DetailView):
 class ConfirmEmailView(View):
     def get(self, request, uidb64, token):
         try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
+            uid = force_str(urlsafe_base64_decode(uidb64))
             user = CustomUser.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
             user = None
@@ -88,7 +89,7 @@ class ConfirmEmailView(View):
         if user is not None and default_token_generator.check_token(user, token):
             user.confirm_email()
             messages.success(request, 'Ваш email подтвержден!')
-            return redirect('signin')
+            return redirect('profile')
         else:
             messages.error(request, 'Ссылка для подтверждения недействительна.')
-            return redirect('signup')
+            return redirect('map')

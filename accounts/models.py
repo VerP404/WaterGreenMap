@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
@@ -68,11 +68,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         confirmation_url = request.build_absolute_uri(confirmation_link)
 
         subject = 'Подтверждение регистрации'
-        message = render_to_string('emails/confirmation_email.html', {
+        html_content = render_to_string('emails/confirmation_email.html', {
             'user': self,
             'confirmation_url': confirmation_url,
         })
-        send_mail(subject, message, None, [self.email])
+
+        email = EmailMultiAlternatives(subject, '', None, [self.email])
+        email.attach_alternative(html_content, "text/html")
+        email.send()
 
     def confirm_email(self):
         self.email_confirmed = True
