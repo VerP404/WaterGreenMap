@@ -176,6 +176,7 @@
         padding-left: 40px; /*  для смещения типов*/
 
     }
+
     .sidebar-cta {
         padding: 0;
         margin: 0;
@@ -185,4 +186,19 @@
         padding: 0;
         margin: 0;
     }
+
+    .sidebar-dropdown {
+        max-height: 300px; /* Ограничение высоты для прокрутки */
+        overflow-y: auto; /* Вертикальная прокрутка, если элементов много */
+    }
+
+    .sidebar-dropdown::-webkit-scrollbar {
+        width: 8px; /* Ширина полосы прокрутки */
+    }
+
+    .sidebar-dropdown::-webkit-scrollbar-thumb {
+        background-color: #007bff; /* Цвет полосы прокрутки */
+        border-radius: 4px; /* Радиус для скругления */
+    }
+
 </style>
