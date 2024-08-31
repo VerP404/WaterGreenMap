@@ -543,73 +543,88 @@
 
 {% block extra_scripts %}
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const maxFileSize = 5 * 1024 * 1024;  // Максимальный размер файла 5 МБ
-            const validImageFormats = ["image/jpeg", "image/png", "image/gif"];  // Допустимые форматы файлов
-            const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
-            
-            // Обработчик отправки формы
-            document.querySelector('form')?.addEventListener('submit', function (e) {
-                if (!validatePhotoUploads()) {
-                    e.preventDefault(); // Останавливаем отправку формы
-                    alert("Пожалуйста, добавьте хотя бы одну фотографию.");
-                }
-            });
-            
-            photoInputs.forEach(input => {
-                input.addEventListener('change', function () {
-                    const file = this.files[0];
-                    const alertBox = document.createElement('div');
-                    alertBox.classList.add('custom-alert');
+document.addEventListener('DOMContentLoaded', function () {
+    const maxFileSize = 5 * 1024 * 1024;  // Максимальный размер файла 5 МБ
+    const validImageFormats = ["image/jpeg", "image/png", "image/gif"];  // Допустимые форматы файлов
+    const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
+    
+    // Функция проверки, что хотя бы одно изображение загружено
+    function validatePhotoUploads() {
+        const photoBoxes = document.querySelectorAll('.upload-box');
+        let photoUploaded = false;
 
-                    if (file) {
-                        // Проверка размера файла
-                        if (file.size > maxFileSize) {
-                            alertBox.textContent = 'Размер файла не должен превышать 5 МБ.';
-                            this.parentElement.appendChild(alertBox);
-                            this.value = '';  // Очищаем поле, если файл не подходит
-
-                            setTimeout(() => {
-                                alertBox.classList.add('show');
-                            }, 10);
-
-                            setTimeout(() => {
-                                alertBox.classList.remove('show');
-                                setTimeout(() => alertBox.remove(), 300);
-                            }, 3000);
-
-                            return;
-                        }
-
-                        // Проверка типа файла
-                        if (!validImageFormats.includes(file.type)) {
-                            alertBox.textContent = 'Недопустимый формат файла. Разрешены только JPEG, PNG, GIF.';
-                            this.parentElement.appendChild(alertBox);
-                            this.value = '';  // Очищаем поле, если файл не подходит
-
-                            setTimeout(() => {
-                                alertBox.classList.add('show');
-                            }, 10);
-
-                            setTimeout(() => {
-                                alertBox.classList.remove('show');
-                                setTimeout(() => alertBox.remove(), 300);
-                            }, 3000);
-
-                            return;
-                        }
-
-                        // Если все ок, показываем предварительный просмотр изображения
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            this.previousElementSibling && this.previousElementSibling.remove();
-                            this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                });
-            });
+        photoBoxes.forEach(box => {
+            const input = box.querySelector('input[type="file"]');
+            if (input && input.files.length > 0) {
+                photoUploaded = true;
+            }
         });
+
+        return photoUploaded;
+    }
+
+    // Обработчик отправки формы
+    document.querySelector('form')?.addEventListener('submit', function (e) {
+        if (!validatePhotoUploads()) {
+            e.preventDefault(); // Останавливаем отправку формы
+            alert("Пожалуйста, добавьте хотя бы одну фотографию.");
+        }
+    });
+
+    photoInputs.forEach(input => {
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            const alertBox = document.createElement('div');
+            alertBox.classList.add('custom-alert');
+
+            if (file) {
+                // Проверка размера файла
+                if (file.size > maxFileSize) {
+                    alertBox.textContent = 'Размер файла не должен превышать 5 МБ.';
+                    this.parentElement.appendChild(alertBox);
+                    this.value = '';  // Очищаем поле, если файл не подходит
+
+                    setTimeout(() => {
+                        alertBox.classList.add('show');
+                    }, 10);
+
+                    setTimeout(() => {
+                        alertBox.classList.remove('show');
+                        setTimeout(() => alertBox.remove(), 300);
+                    }, 3000);
+
+                    return;
+                }
+
+                // Проверка типа файла
+                if (!validImageFormats.includes(file.type)) {
+                    alertBox.textContent = 'Недопустимый формат файла. Разрешены только JPEG, PNG, GIF.';
+                    this.parentElement.appendChild(alertBox);
+                    this.value = '';  // Очищаем поле, если файл не подходит
+
+                    setTimeout(() => {
+                        alertBox.classList.add('show');
+                    }, 10);
+
+                    setTimeout(() => {
+                        alertBox.classList.remove('show');
+                        setTimeout(() => alertBox.remove(), 300);
+                    }, 3000);
+
+                    return;
+                }
+
+                // Если все ок, показываем предварительный просмотр изображения
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.previousElementSibling && this.previousElementSibling.remove();
+                    this.insertAdjacentHTML('beforebegin', `<img src="${e.target.result}" alt="photo">`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+});
 
     </script>
 
