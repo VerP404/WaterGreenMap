@@ -6,10 +6,14 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
+                    <th scope="col">ID</th>
                     <th scope="col">Изображение</th>
                     <th scope="col">Название</th>
                     <th scope="col">Тип объекта</th>
+                    <th scope="col">Город</th>
                     <th scope="col">Автор</th>
+                    <th scope="col">Год</th>
+                    <th scope="col">Мониторинг</th>
                     {% if show_user_column %}
                         <th scope="col">Добавлено</th>
                     {% endif %}
@@ -19,6 +23,7 @@
                 <tbody>
                 {% for project in projects %}
                     <tr class="project-row" onclick="window.location.href='{% url 'project_detail' project.pk %}'">
+                        <td>{{ project.id }}</td>
                         <td>
                             {% if project.photos.all %}
                                 <img src="{{ project.photos.all.0.image.url }}" width="50" class="img-fluid"
@@ -30,7 +35,12 @@
                         </td>
                         <td>{{ project.title }}</td>
                         <td>{{ project.main_type.name }}</td>
+                        <td>{{ project.city|default_if_none:"-" }}</td>
                         <td>{{ project.project_author|default_if_none:"-" }}</td>
+                        <td>{{ project.creation_year|default_if_none:"-" }}</td>
+                        <td>
+                            <input type="checkbox" {% if project.is_monitoring %}checked{% endif %} disabled>
+                        </td>
                         {% if show_user_column %}
                             <td>{{ project.user.last_name }} {{ project.user.first_name }}</td>
                         {% endif %}

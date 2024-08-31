@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}ВЗИК | Добавить проект{% endblock %}
+{% block title %}Зелёный компас{% endblock %}
 
 {% block content %}
     <main class="content">
@@ -546,9 +546,16 @@
         document.addEventListener('DOMContentLoaded', function () {
             const maxFileSize = 5 * 1024 * 1024;  // Максимальный размер файла 5 МБ
             const validImageFormats = ["image/jpeg", "image/png", "image/gif"];  // Допустимые форматы файлов
-
             const photoInputs = document.querySelectorAll('.upload-box input[type="file"]');
-
+            
+            // Обработчик отправки формы
+            document.querySelector('form')?.addEventListener('submit', function (e) {
+                if (!validatePhotoUploads()) {
+                    e.preventDefault(); // Останавливаем отправку формы
+                    alert("Пожалуйста, добавьте хотя бы одну фотографию.");
+                }
+            });
+            
             photoInputs.forEach(input => {
                 input.addEventListener('change', function () {
                     const file = this.files[0];
